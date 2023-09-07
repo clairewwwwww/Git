@@ -36,7 +36,7 @@ public class Blob
         writeFile(convertToSHA1(fileName), readFile(fileName));
     }
 
-    public String convertToSHA1(String fileName) 
+    private String convertToSHA1(String fileName) 
     {
         byte[] convertme = fileName.getBytes();
 
@@ -76,9 +76,14 @@ public class Blob
 		}
     }
 
-    public String getStringFileName()
+    public String getFileName()
     {
         return fileName;
+    }
+
+    public String getSHA1String()
+    {
+        return convertToSHA1(fileName);
     }
  }
 

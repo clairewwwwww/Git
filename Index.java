@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -38,6 +39,10 @@ public class Index
     public void addBlob(String fileName) throws IOException
     {
         Blob newBlob = new Blob(fileName);
-        newBlob.move();
+        newBlob.writeToNewFile();
+        PrintWriter pw = new PrintWriter("index");
+        pw.println(newBlob.getFileName() + ": " + newBlob.getSHA1String());
+        pw.close();
     }
+
 }
