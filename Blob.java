@@ -17,11 +17,18 @@ The new filename contains ONLY the SHA1 Hash
 The file contains the same contents of the original file
 **Optional Stretch Goal:  Saves and reads the data as zip-compressed data bytes instead of a raw text / String
 Contains another function to get the generated SHA1 as a String */
-    public Blob(File file) throws IOException
+    private String inputFileName;
+    public Blob(String inputFileName) throws IOException
     {
+        File file = new File(inputFileName);
+		if (!file.exists()) 
+		{
+			throw new FileNotFoundException();
+		}
+
         byte[] convertme = file.getName().getBytes();
-        String fileName = toSHA1(convertme);
-        writeFile(fileName, readFile(file.getName()));
+        String newFileName = toSHA1(convertme);
+        writeFile(newFileName, readFile(file.getName()));
     }
 
     public static String toSHA1(byte[] convertme) 
@@ -58,6 +65,11 @@ Contains another function to get the generated SHA1 as a String */
 		{
 			return "File not found, whoops!";
 		}
+    }
+
+    public String getStringFileName()
+    {
+        return inputFileName;
     }
  }
 
