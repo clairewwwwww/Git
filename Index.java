@@ -1,9 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class Index 
+public class Index
 {
     /*Can "initialize" or "init" a project which
         If the file does not yet exist:
@@ -31,10 +32,12 @@ public class Index
 			File newFile = new File("index");
 		}
 
-        if (!file.isDirectory()) 
-        {
-            new File("objects").mkdirs();
-        }
-        return;
+        new File("objects").mkdirs();
+    }
+
+    public void addBlob(String fileName) throws IOException
+    {
+        Blob newBlob = new Blob(fileName);
+        newBlob.move();
     }
 }
