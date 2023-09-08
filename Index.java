@@ -41,6 +41,7 @@ public class Index
 
     public void addBlob(String fileName) throws IOException
     {
+        initialize(fileName);
         Blob blob = new Blob(fileName);
         String dirName = "objects";
         String SHA1Name = blob.getSHA1String();
@@ -59,6 +60,7 @@ public class Index
 
     public void removeBlob(String fileName) throws Exception
     {
+        initialize(fileName);
         File file = new File(fileName);
         Blob blob = new Blob(fileName);
         if (!file.exists()) 

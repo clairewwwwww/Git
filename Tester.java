@@ -1,7 +1,10 @@
-public class BlobTester {
-    public static void main(String args[])
+import java.io.IOException;
+
+public class Tester {
+    public static void main(String args[]) throws IOException
     {
-        Blob tester = new Blob("test1");
+        Index tester = new Index();
+        tester.initialize("test1");
     }
     
 }
