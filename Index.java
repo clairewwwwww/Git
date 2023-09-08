@@ -1,5 +1,8 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -38,11 +41,49 @@ public class Index
 
     public void addBlob(String fileName) throws IOException
     {
-        Blob newBlob = new Blob(fileName);
-        newBlob.writeToNewFile();
+        Blob blob = new Blob(fileName);
+        String dirName = "objects";
+        String SHA1Name = blob.getSHA1String();
+        File actualFile = new File (dirName, SHA1Name);
+        blob.writeToNewFile();
         PrintWriter pw = new PrintWriter("index");
-        pw.println(newBlob.getFileName() + ": " + newBlob.getSHA1String());
+        pw.println(namePairs(fileName));
         pw.close();
     }
 
+    private String namePairs(String fileName)
+    {
+        Blob blob = new Blob(fileName);
+        return blob.getFileName() + ": " + blob.getSHA1String()
+    }
+
+    public void removeBlob(String fileName) throws Exception
+    {
+        File file = new File(fileName);
+        Blob blob = new Blob(fileName);
+        if (!file.exists()) 
+        {
+            throw new Exception("file not found");
+        }
+        else
+        {
+            File doomedFile = new File ("objects", blob.getSHA1String());
+            doomedFile.delete();
+            removeLine(namePairs(fileName));
+
+        }
+    }
+
+    private void removeLine(String lineContent) throws IOException
+    {
+        File file = new File("Index");
+        File temp = new File("_temp_");
+        PrintWriter out = new PrintWriter(new FileWriter(temp));
+        Files.lines(file.toPath())
+        .filter(line -> !line.contains(lineContent))
+        .forEach(out::println);
+        out.flush();
+        out.close();
+        temp.renameTo(file);
+    }
 }
