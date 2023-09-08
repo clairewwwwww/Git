@@ -2,10 +2,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
@@ -33,23 +33,18 @@ public class Blob
 			throw new FileNotFoundException();
 		}
     }
-
-    public void writeNewFileToFolder() throws IOException
+    
+    public void createFile() throws IOException 
     {
-        String SHA1Name = getSHA1String();
-        String path = "objects";
-        String fname= path+File.separator+SHA1Name;
+        String path = "objects" + File.separator + getSHA1String();
         File f = new File(path);
-        File f1 = new File(fname);
-        f.mkdirs() ;
-        try {
-        f1.createNewFile();
-        writeFile(SHA1Name, readFile(fileName));
-        } catch (IOException e) 
-        {
-        e.printStackTrace();
-        }
+        f.getParentFile().mkdirs(); 
+        f.createNewFile();
+        FileWriter fw = new FileWriter(f);
+        fw.write(readFile(fileName));
+        fw.close();
     }
+    
 
     public String convertToSHA1(String fileName)
     {
@@ -83,14 +78,6 @@ public class Blob
         formatter.close();
         return result;
     }
-
-	private void writeFile(String fileName, String inputContent) throws IOException
-	{
-        PrintWriter pw = new PrintWriter(fileName); 
-        pw.print(inputContent); 
-		pw.close();
-        
-	}
 
 	private String readFile(String fileName) throws IOException 
     {

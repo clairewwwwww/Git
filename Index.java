@@ -2,7 +2,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
+
+import java.io.FileWriter;
 import java.nio.file.Files;
 
 public class Index
@@ -39,20 +40,15 @@ public class Index
     public void addBlob(String fileName) throws IOException
     {
         Blob blob = new Blob(fileName);
-        blob.writeNewFileToFolder();
+        blob.createFile();
         
         PrintWriter pw = new PrintWriter("index");
         pw.println(namePairs(fileName));
         pw.close();
     }
 
-    private String namePairs(String fileName) throws IOException
-    {
-        Blob blob = new Blob(fileName);
-        return blob.getFileName() + ": " + blob.getSHA1String();
-    }
-
     public void removeBlob(String fileName) throws Exception
+
     {
         File file = new File(fileName);
         Blob blob = new Blob(fileName);
@@ -78,5 +74,10 @@ public class Index
         out.flush();
         out.close();
         temp.renameTo(file);
+    }
+    private String namePairs(String fileName) throws IOException
+    {
+        Blob blob = new Blob(fileName);
+        return blob.getFileName() + ": " + blob.getSHA1String();
     }
 }
