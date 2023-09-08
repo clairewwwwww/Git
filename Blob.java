@@ -4,8 +4,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Formatter;
 
 public class Blob
 {
@@ -31,33 +34,62 @@ public class Blob
 		}
     }
 
-    public void writeToNewFile() throws IOException
+    public void writeNewFileToFolder() throws IOException
     {
-        writeFile(convertToSHA1(fileName), readFile(fileName));
+        String SHA1Name = getSHA1String();
+        String path = "objects";
+        String fname= path+File.separator+SHA1Name;
+        File f = new File(path);
+        File f1 = new File(fname);
+        f.mkdirs() ;
+        try {
+        f1.createNewFile();
+        writeFile(SHA1Name, readFile(fileName));
+        } catch (IOException e) 
+        {
+        e.printStackTrace();
+        }
     }
 
-    private String convertToSHA1(String fileName) 
+    public String convertToSHA1(String fileName)
     {
-        byte[] convertme = fileName.getBytes();
-
-        MessageDigest md = null;
-        try 
+        String sha1 = "";
+        try
         {
-            md = MessageDigest.getInstance("SHA-1");
+            MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+            crypt.reset();
+            crypt.update(fileName.getBytes("UTF-8"));
+            sha1 = byteToHex(crypt.digest());
         }
-        catch(NoSuchAlgorithmException e) 
+        catch(NoSuchAlgorithmException e)
         {
             e.printStackTrace();
-        } 
-        return new String(md.digest(convertme));
+        }
+        catch(UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
+        return sha1;
+    }
+    
+    private static String byteToHex(final byte[] hash)
+    {
+        Formatter formatter = new Formatter();
+        for (byte b : hash)
+        {
+            formatter.format("%02x", b);
+        }
+        String result = formatter.toString();
+        formatter.close();
+        return result;
     }
 
-	private void writeFile(String fileName, String inputContent) throws IOException // inputContent = what the user want to write to the														// file
+	private void writeFile(String fileName, String inputContent) throws IOException
 	{
-		PrintWriter pw = new PrintWriter(convertToSHA1(fileName)); // the name of the output file
-		pw.print(inputContent); // print the content
+        PrintWriter pw = new PrintWriter(fileName); 
+        pw.print(inputContent); 
 		pw.close();
-
+        
 	}
 
 	private String readFile(String fileName) throws IOException 
@@ -86,6 +118,3 @@ public class Blob
         return convertToSHA1(fileName);
     }
  }
-
-
-   

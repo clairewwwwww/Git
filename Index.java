@@ -38,16 +38,9 @@ public class Index
 
     public void addBlob(String fileName) throws IOException
     {
-        //initialize(fileName);
         Blob blob = new Blob(fileName);
-
-        String dirName = "objects";
-        String SHA1Name = blob.getSHA1String();
-        File dir = new File (dirName);
-        File actualFile = new File (dir, SHA1Name);
-        blob.writeToNewFile();
-
-        //write to Index
+        blob.writeNewFileToFolder();
+        
         PrintWriter pw = new PrintWriter("index");
         pw.println(namePairs(fileName));
         pw.close();
@@ -61,7 +54,6 @@ public class Index
 
     public void removeBlob(String fileName) throws Exception
     {
-        //initialize(fileName);
         File file = new File(fileName);
         Blob blob = new Blob(fileName);
         if (!file.exists()) 
@@ -73,7 +65,6 @@ public class Index
             File doomedFile = new File ("objects", blob.getSHA1String());
             doomedFile.delete();
             removeLine(namePairs(fileName));
-
         }
     }
     private void removeLine(String lineContent) throws IOException
