@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,7 +32,7 @@ public class Blob
 			throw new FileNotFoundException();
 		}
     }
-    
+
     public void createFile() throws IOException 
     {
         String path = "objects" + File.separator + getSHA1String();

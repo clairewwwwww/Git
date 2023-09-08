@@ -39,14 +39,14 @@ public class Index
     {
         Blob blob = new Blob(fileName);
         blob.createFile();
-        
-        PrintWriter pw = new PrintWriter("index");
-        pw.println(namePairs(fileName));
+
+        PrintWriter pw = new PrintWriter(new FileWriter("index", true));
+        pw.append(namePairs(fileName));
+        pw.append("\n");
         pw.close();
     }
 
     public void removeBlob(String fileName) throws Exception
-
     {
         File file = new File(fileName);
         Blob blob = new Blob(fileName);
@@ -76,6 +76,6 @@ public class Index
     private String namePairs(String fileName) throws IOException
     {
         Blob blob = new Blob(fileName);
-        return blob.getFileName() + ": " + blob.getSHA1String();
+        return fileName + ": " + blob.getSHA1String();
     }
 }
