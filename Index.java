@@ -51,10 +51,10 @@ public class Index
         pw.close();
     }
 
-    private String namePairs(String fileName)
+    private String namePairs(String fileName) throws IOException
     {
         Blob blob = new Blob(fileName);
-        return blob.getFileName() + ": " + blob.getSHA1String()
+        return blob.getFileName() + ": " + blob.getSHA1String();
     }
 
     public void removeBlob(String fileName) throws Exception
@@ -73,7 +73,6 @@ public class Index
 
         }
     }
-
     private void removeLine(String lineContent) throws IOException
     {
         File file = new File("Index");
