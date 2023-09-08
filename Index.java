@@ -1,12 +1,9 @@
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class Index
 {
@@ -22,12 +19,12 @@ public class Index
             Appends the pair of original filename / SHA1 on a unique line in a file named 'index'
     Can remove Blobs given a filename
         Removes the filename and Blob SHA1 from the key/value pair */
-    public Index()
+    public Index(String fileName)
     {
-
+        initialize(fileName);
     }
 
-    public void initialize(String fileName)
+    private void initialize(String fileName)
     {
         File file = new File(fileName);
 
@@ -41,12 +38,16 @@ public class Index
 
     public void addBlob(String fileName) throws IOException
     {
-        initialize(fileName);
+        //initialize(fileName);
         Blob blob = new Blob(fileName);
+
         String dirName = "objects";
         String SHA1Name = blob.getSHA1String();
-        File actualFile = new File (dirName, SHA1Name);
+        File dir = new File (dirName);
+        File actualFile = new File (dir, SHA1Name);
         blob.writeToNewFile();
+
+        //write to Index
         PrintWriter pw = new PrintWriter("index");
         pw.println(namePairs(fileName));
         pw.close();
@@ -60,7 +61,7 @@ public class Index
 
     public void removeBlob(String fileName) throws Exception
     {
-        initialize(fileName);
+        //initialize(fileName);
         File file = new File(fileName);
         Blob blob = new Blob(fileName);
         if (!file.exists()) 

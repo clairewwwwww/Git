@@ -54,7 +54,7 @@ public class Blob
 
 	private void writeFile(String fileName, String inputContent) throws IOException // inputContent = what the user want to write to the														// file
 	{
-		PrintWriter pw = new PrintWriter("This is the output file name"); // the name of the output file
+		PrintWriter pw = new PrintWriter(convertToSHA1(fileName)); // the name of the output file
 		pw.print(inputContent); // print the content
 		pw.close();
 
