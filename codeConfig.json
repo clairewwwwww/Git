@@ -1,0 +1,47 @@
+[
+    {
+        "className": "Git",
+        "constructorConfigs": [
+            {
+                "parameterTypes": [],
+                "values": []
+            }
+        ],
+        "methodConfigs": [
+            {
+                "methodName": "init",
+                "parameters": [],
+                "values": []
+            },
+            {
+                "methodName": "add",
+                "parameters": [
+                    "String"
+                ],
+                "values": [
+                    "__TEST_FILE_NAME__"
+                ]
+            }
+        ]
+    },
+    {
+        "className": "Blob",
+        "constructorConfigs": [
+            {
+                "parameterTypes": [
+                    "String"
+                ],
+                "values": [
+                    "__TEST_FILE_NAME__"
+                ]
+            }
+        ],
+        "methodConfigs": [
+            {
+                "methodName": "getSha1",
+                "parameters": [],
+                "values": []
+            }
+        ]
+    }
+]
