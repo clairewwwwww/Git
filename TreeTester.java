@@ -14,6 +14,7 @@ public class TreeTester {
 
     @AfterAll
     static void tearDownAfterClass() throws Exception {
+        Util.deleteDirectory("objects");
     }
 
     @Test

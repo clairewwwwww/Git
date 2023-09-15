@@ -29,7 +29,7 @@ public class BlobTester {
 
     @Test
     @DisplayName("Verify Blob has correct contents")
-    void testInitialize() throws Exception {
+    void testBlobContents() throws Exception {
         String originalFileContent = Util.readFile("testerFile.txt");
         String blobFileContent = Util.readFile("objects/2aae6c35c94fcfb415dbe95f408b9ce91ee846ed");
         assertEquals(originalFileContent, blobFileContent);
