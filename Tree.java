@@ -1,5 +1,8 @@
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class Tree {
     protected HashMap<String, String> blobMap;
@@ -47,4 +50,21 @@ public class Tree {
         return false;
     }
 
+    public void writeToFile() throws IOException, NoSuchAlgorithmException {
+        StringBuilder builder = new StringBuilder();
+
+        for (Map.Entry<String, String> entry : blobMap.entrySet()) {
+            builder.append("blob : " + entry.getValue() + " : " + entry.getKey() + "\n");
+        }
+
+        for (String hash : treeSet.toArray(new String[treeSet.size()])) {
+            builder.append("tree : " + hash + "\n");
+        }
+
+        builder.deleteCharAt(builder.length() - 1);
+
+        String result = builder.toString();
+        System.out.println(result);
+        Util.writeFile("objects/" + Util.hashString(result), result);
+    }
 }

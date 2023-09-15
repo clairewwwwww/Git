@@ -29,7 +29,7 @@ public class Blob {
         if (!file.exists()) {
             throw new FileNotFoundException();
         }
-        this.sha1String = convertToSHA1(readFile(fileName));
+        this.sha1String = Util.hashString(readFile(fileName));
     }
 
     public void createFile() throws Exception {
@@ -41,28 +41,6 @@ public class Blob {
         FileWriter fw = new FileWriter(f);
         fw.write(content);
         fw.close();
-    }
-
-    public String convertToSHA1(String content) throws Exception {
-        try {
-            MessageDigest crypt = MessageDigest.getInstance("SHA-1");
-            byte[] messageDigest = crypt.digest(content.getBytes());
-            BigInteger no = new BigInteger(1, messageDigest);
-
-            // Convert message digest into hex value
-            String hashString = no.toString(16);
-
-            // Add preceding 0s to make it 32 bit
-            while (hashString.length() < 32) {
-                hashString = "0" + hashString;
-            }
-
-            // return the HashText
-            return hashString;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        throw new Exception();
     }
 
     private String readFile(String fileName) throws IOException {
