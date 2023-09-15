@@ -25,14 +25,26 @@ public class Tree {
         } else if (splits.length == 3) {
             // Adding a blob
             if (splits[0].equals("blob")) {
-                if (blobMap.containsKey(splits[1])) {
+                if (blobMap.containsKey(splits[2])) {
                     throw new Exception("Cannot add a blob with a duplicate filename");
                 }
-                blobMap.put(splits[1], splits[2]);
+                blobMap.put(splits[2], splits[1]);
                 return;
             }
         }
 
         throw new Exception("Invalid add format");
     }
+
+    public boolean remove(String key) {
+        if (blobMap.containsKey(key)) {
+            blobMap.remove(key);
+            return true;
+        } else if (treeSet.contains(key)) {
+            treeSet.remove(key);
+            return true;
+        }
+        return false;
+    }
+
 }

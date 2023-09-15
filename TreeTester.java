@@ -39,7 +39,7 @@ public class TreeTester {
             tree.add("blob : bd1ccec139dead5ee0d8c3a0499b42a7d43ac44b : file.txt");
         });
 
-        tree.add("blob : a64e2a4adcc4ae20e6e35babd2a181619cb8e224 : file.txt");
+        tree.add("blob : a64e2a4adcc4ae20e6e35babd2a181619cb8e224 : file2.txt");
 
         tree.add("tree : bd1ccec139dead5ee0d8c3a0499b42a7d43ac44b");
 
@@ -48,5 +48,18 @@ public class TreeTester {
         });
 
         tree.add("tree : a1f239cbcd40f722555acfc7d23be06dee9d815e");
+    }
+
+    @Test
+    @DisplayName("Verify tree remove method works")
+    void testTreeRemove() throws Exception {
+        Tree tree = new Tree();
+        tree.add("tree : a1f239cbcd40f722555acfc7d23be06dee9d815e");
+        tree.add("blob : a64e2a4adcc4ae20e6e35babd2a181619cb8e224 : file.txt");
+
+        assertTrue(tree.remove("a1f239cbcd40f722555acfc7d23be06dee9d815e"));
+        assertFalse(tree.remove("a1f239cbcd40f722555acfc7d23be06dee9d815e"));
+        assertFalse(tree.remove("a64e2a4adcc4ae20e6e35babd2a181619cb8e224"));
+        assertTrue(tree.remove("file.txt"));
     }
 }
