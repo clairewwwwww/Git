@@ -1,25 +1,52 @@
 [
     {
-        "className": "Git",
+        "className": "Index",
         "constructorConfigs": [
             {
-                "parameterTypes": [],
-                "values": []
+                "parameterTypes": ["String"],
+                "values": ["FILE_NAME"]
             }
         ],
         "methodConfigs": [
             {
-                "methodName": "init",
+                "methodName": "initialize",
                 "parameters": [],
                 "values": []
             },
             {
-                "methodName": "add",
+                "methodName": "addBlob",
                 "parameters": [
                     "String"
                 ],
                 "values": [
-                    "__TEST_FILE_NAME__"
+                    "FILE_NAME"
+                ]
+            },
+            {
+                "methodName": "removeBlob",
+                "parameters": [
+                    "String"
+                ],
+                "values": [
+                    "FILE_NAME"
+                ]
+            },
+            {
+                "methodName": "removeLine",
+                "parameters": [
+                    "String"
+                ],
+                "values": [
+                    "LINE_CONTENT"
+                ]
+            },
+            {
+                "methodName": "namePairs",
+                "parameters": [
+                    "String"
+                ],
+                "values": [
+                    "FILE_NAME"
                 ]
             }
         ]
@@ -32,13 +59,38 @@
                     "String"
                 ],
                 "values": [
-                    "__TEST_FILE_NAME__"
+                    "FILE_NAME"
                 ]
             }
         ],
         "methodConfigs": [
             {
-                "methodName": "getSha1",
+                "methodName": "createFile",
+                "parameters": [],
+                "values": []
+            },
+            {
+                "methodName": "convertToSha1",
+                "parameters": ["String"],
+                "values": ["FILE_NAME"]
+            },
+            {
+                "methodName": "byteToHex",
+                "parameters": ["byte[]"],
+                "values": ["HASH"]
+            },
+            {
+                "methodName": "readFile",
+                "parameters": ["String"],
+                "values": ["FILE_NAME"]
+            },
+            {
+                "methodName": "getFileName",
+                "parameters": [],
+                "values": []
+            },
+            {
+                "methodName": "getSHA1String",
                 "parameters": [],
                 "values": []
             }
