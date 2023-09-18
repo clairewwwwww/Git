@@ -27,27 +27,66 @@ public class IndexTester {
     @Test
     @DisplayName("Verify init has created objects and index")
     void testInit() throws Exception {
+        // Init is called in the constructor
         new Index();
 
+        // Confirming init created the objects folder
         assertTrue(Util.exists("objects"));
+
+        // Confirming init created the index file
         assertTrue(Util.exists("index"));
     }
 
     @Test
-    @DisplayName("Verify adding and removing Blobs with Index works")
+    @DisplayName("Verify adding Blobs with Index works")
     void testAdd() throws Exception {
         Index index = new Index();
+
+        // Confirming index is empty
         assertEquals("", Util.readFile("index"));
+
         index.addBlob("testerFile.txt");
+
+        // Confirming testerFile.txt was added to index
         assertEquals("testerFile.txt : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed\n", Util.readFile("index"));
+
         index.addBlob("testerFile2.txt");
+
+        // Confirming testerFile2.txt was added to index
         assertEquals(
                 "testerFile.txt : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed\ntesterFile2.txt : 7e4fb4975ec34b65826fd95e60e628110dbef839\n",
                 Util.readFile("index"));
+    }
+
+    @Test
+    @DisplayName("Verify removing Blobs with Index works")
+    void testRemove() throws Exception {
+        Util.deleteFile("index");
+        Index index = new Index();
+
+        // Confirming index is empty
+        assertEquals("", Util.readFile("index"));
+
+        index.addBlob("testerFile.txt");
+
+        // Confirming testerFile.txt was added to index
+        assertEquals("testerFile.txt : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed\n", Util.readFile("index"));
+
+        index.addBlob("testerFile2.txt");
+
+        // Confirming testerFile2.txt was added to index
+        assertEquals(
+                "testerFile.txt : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed\ntesterFile2.txt : 7e4fb4975ec34b65826fd95e60e628110dbef839\n",
+                Util.readFile("index"));
+
         index.removeBlob("testerFile.txt");
+
+        // Confirming testerFile.txt was removed from index
         assertEquals(
                 "testerFile2.txt : 7e4fb4975ec34b65826fd95e60e628110dbef839\n",
                 Util.readFile("index"));
+
+        // Confirming the blob file was not deleted
         assertTrue(Util.exists("objects/7e4fb4975ec34b65826fd95e60e628110dbef839"));
     }
 }

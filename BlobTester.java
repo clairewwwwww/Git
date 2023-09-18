@@ -24,6 +24,7 @@ public class BlobTester {
     @Test
     @DisplayName("Verify Blob file has been created")
     void testBlobCreated() throws Exception {
+        // Confirm the Blob creates a file in the correct location
         assertTrue(Util.exists("objects/2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"));
     }
 
@@ -32,6 +33,8 @@ public class BlobTester {
     void testBlobContents() throws Exception {
         String originalFileContent = Util.readFile("testerFile.txt");
         String blobFileContent = Util.readFile("objects/2aae6c35c94fcfb415dbe95f408b9ce91ee846ed");
+
+        // Confirm the Blob's contents match the original file's contents
         assertEquals(originalFileContent, blobFileContent);
     }
 }

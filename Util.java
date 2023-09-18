@@ -61,7 +61,11 @@ public class Util {
 
     public static void createFile(String path) throws IOException {
         Path pathObject = Paths.get(path);
-        Files.createDirectories(pathObject.getParent());
+
+        if (pathObject.getParent() != null) {
+            Files.createDirectories(pathObject.getParent());
+        }
+
         Files.createFile(pathObject);
     }
 }
