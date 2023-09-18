@@ -3,8 +3,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Index {
     /*
@@ -23,23 +21,21 @@ public class Index {
      * Can remove Blobs given a filename
      * Removes the filename and Blob SHA1 from the key/value pair
      */
-    public Index() throws IOException {
-        initialize();
+    public Index() {
+        initialize("index");
     }
 
-    private void initialize() throws IOException {
-        Path indexPath = Paths.get("index");
-        Path objectsPath = Paths.get("objects/");
-        if (!Files.exists(indexPath)) {
-            Files.createFile(indexPath);
+    private void initialize(String fileName) {
+        File file = new File(fileName);
+
+        if (!file.exists()) {
+            File newFile = new File("index");
         }
 
-        if (!Files.exists(objectsPath)) {
-            Files.createDirectory(objectsPath);
-        }
+        new File("objects").mkdirs();
     }
 
-    public void addBlob(String fileName) throws Exception {
+    public void addBlob(String fileName) throws IOException {
         Blob blob = new Blob(fileName);
         blob.createFile();
 
@@ -73,8 +69,8 @@ public class Index {
         temp.renameTo(file);
     }
 
-    private String namePairs(String fileName) throws Exception {
+    private String namePairs(String fileName) throws IOException {
         Blob blob = new Blob(fileName);
-        return fileName + " : " + blob.getSHA1String();
+        return fileName + ": " + blob.getSHA1String();
     }
 }

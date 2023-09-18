@@ -24,7 +24,7 @@ public class BlobTester {
     @Test
     @DisplayName("Verify Blob file has been created")
     void testBlobCreated() throws Exception {
-        // Confirm the Blob creates a file in the correct location
+        // Confirm the Blob creates a file in the correct location with the correct hash
         assertTrue(Util.exists("objects/2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"));
     }
 

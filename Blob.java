@@ -4,6 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Formatter;
 
 public class Blob {
     /*
@@ -19,26 +23,49 @@ public class Blob {
      * - Contains another function to get the generated SHA1 as a String
      */
 
-    private String fileName, sha1String;
+    private String fileName;
 
-    public Blob(String fileName) throws Exception {
+    public Blob(String fileName) throws IOException {
         this.fileName = fileName;
         File file = new File(fileName);
         if (!file.exists()) {
             throw new FileNotFoundException();
         }
-        this.sha1String = Util.hashString(readFile(fileName));
     }
 
-    public void createFile() throws Exception {
-        String content = readFile(fileName);
-        String path = "objects" + File.separator + this.sha1String;
+    public void createFile() throws IOException {
+        String path = "objects" + File.separator + getSHA1String();
         File f = new File(path);
         f.getParentFile().mkdirs();
         f.createNewFile();
         FileWriter fw = new FileWriter(f);
-        fw.write(content);
+        fw.write(readFile(fileName));
         fw.close();
+    }
+
+    public String convertToSHA1(String fileName) {
+        String sha1 = "";
+        try {
+            MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+            crypt.reset();
+            crypt.update(fileName.getBytes("UTF-8"));
+            sha1 = byteToHex(crypt.digest());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return sha1;
+    }
+
+    private static String byteToHex(final byte[] hash) {
+        Formatter formatter = new Formatter();
+        for (byte b : hash) {
+            formatter.format("%02x", b);
+        }
+        String result = formatter.toString();
+        formatter.close();
+        return result;
     }
 
     private String readFile(String fileName) throws IOException {
@@ -61,6 +88,6 @@ public class Blob {
     }
 
     public String getSHA1String() {
-        return sha1String;
+        return convertToSHA1(fileName);
     }
 }
