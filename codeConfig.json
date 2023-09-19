@@ -1,0 +1,99 @@
+[
+    {
+        "className": "Index",
+        "constructorConfigs": [
+            {
+                "parameterTypes": ["String"],
+                "values": ["FILE_NAME"]
+            }
+        ],
+        "methodConfigs": [
+            {
+                "methodName": "initialize",
+                "parameters": [],
+                "values": []
+            },
+            {
+                "methodName": "addBlob",
+                "parameters": [
+                    "String"
+                ],
+                "values": [
+                    "FILE_NAME"
+                ]
+            },
+            {
+                "methodName": "removeBlob",
+                "parameters": [
+                    "String"
+                ],
+                "values": [
+                    "FILE_NAME"
+                ]
+            },
+            {
+                "methodName": "removeLine",
+                "parameters": [
+                    "String"
+                ],
+                "values": [
+                    "LINE_CONTENT"
+                ]
+            },
+            {
+                "methodName": "namePairs",
+                "parameters": [
+                    "String"
+                ],
+                "values": [
+                    "FILE_NAME"
+                ]
+            }
+        ]
+    },
+    {
+        "className": "Blob",
+        "constructorConfigs": [
+            {
+                "parameterTypes": [
+                    "String"
+                ],
+                "values": [
+                    "FILE_NAME"
+                ]
+            }
+        ],
+        "methodConfigs": [
+            {
+                "methodName": "createFile",
+                "parameters": [],
+                "values": []
+            },
+            {
+                "methodName": "convertToSha1",
+                "parameters": ["String"],
+                "values": ["FILE_NAME"]
+            },
+            {
+                "methodName": "byteToHex",
+                "parameters": ["byte[]"],
+                "values": ["HASH"]
+            },
+            {
+                "methodName": "readFile",
+                "parameters": ["String"],
+                "values": ["FILE_NAME"]
+            },
+            {
+                "methodName": "getFileName",
+                "parameters": [],
+                "values": []
+            },
+            {
+                "methodName": "getSHA1String",
+                "parameters": [],
+                "values": []
+            }
+        ]
+    }
+]
