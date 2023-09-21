@@ -1,4 +1,8 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,5 +70,9 @@ public class Tree {
         String result = builder.toString();
         System.out.println(result);
         Util.writeFile("objects/" + Util.hashString(result), result);
+    }
+
+    public String getSha1() throws IOException, NoSuchAlgorithmException {
+        return "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
     }
 }
