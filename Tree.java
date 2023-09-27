@@ -1,8 +1,10 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,7 +74,54 @@ public class Tree {
         Util.writeFile("objects/" + Util.hashString(result), result);
     }
 
-    public String getSha1() throws IOException, NoSuchAlgorithmException {
-        return "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+    public String getSha1(String input) throws IOException, NoSuchAlgorithmException {
+        return Util.hashString(input);
     }
+
+    public String addDirectory(String directoryPath) throws Exception
+    {
+        String SHA1 = ""; //SHA1 - the saved Tree location in the objects folder
+        File directory = new File("directoryPath");
+        if(!directory.isDirectory())
+        {
+            throw new Exception("Invalid directory path");
+        }
+        for(File fileEntry : directory.listFiles())
+        {
+            if(fileEntry.isDirectory())
+            {
+                String folderName = fileEntry.getName();
+                String treeEntry = "tree : " + getSha1(Blob.readFile(fileEntry.getName()));
+                add(treeEntry);
+                addDirectory(folderName);
+            }
+            else
+            {
+                String fileName = fileEntry.getName();
+                Blob blob = new Blob (fileName);
+                blob.createFile();
+                String blobEntry = "blob : " + getSha1(Blob.readFile(fileName)) + " : " + fileName;
+                add(blobEntry); 
+            }
+        }
+        return SHA1;
+    }
+
+    /* 
+    public void listFilesForFolder(final File folder) 
+    {
+        for (final File fileEntry : folder.listFiles()) 
+        {
+            if (fileEntry.isDirectory()) 
+            {
+                listFilesForFolder(fileEntry);
+            } 
+            else 
+            {
+                System.out.println(fileEntry.getName()); //getPath;
+            }
+        }
+    }*/
 }
+    //final File folder = new File("/home/you/Desktop");
+    //listFilesForFolder(folder);
