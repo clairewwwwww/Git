@@ -15,7 +15,7 @@ public class Commit {
         commit = new File("Commit");
         PrintWriter pw = new PrintWriter(commit);
         Tree tree = new Tree();
-        String treeSha = tree.getSha1();
+        String treeSha = tree.getSha1(Blob.readFile("Commit"));
         String date = getDate();
         pw.print(treeSha + '\n' + prevCommit + '\n' + '\n' + author + '\n' + date + '\n' + summary);
         pw.close();

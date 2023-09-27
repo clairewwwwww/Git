@@ -41,7 +41,7 @@ public class Blob {
         fw.close();
     }
 
-    private String readFile(String fileName) throws IOException {
+    public static String readFile(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName)); // the name of the file that want to read
         try {
             String string = "";
