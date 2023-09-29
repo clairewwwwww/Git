@@ -43,7 +43,7 @@ public class Index {
         Blob blob = new Blob(fileName);
         blob.createFile();
 
-        PrintWriter pw = new PrintWriter(new FileWriter("index", true));
+        PrintWriter pw = new PrintWriter(new FileWriter("index", false));
         pw.append(namePairs(fileName));
         pw.append("\n");
         pw.close();
