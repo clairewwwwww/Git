@@ -1,6 +1,11 @@
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -100,5 +105,74 @@ public class TreeTester {
                         "blob : a64e2a4adcc4ae20e6e35babd2a181619cb8e224 : file2.txt\n" + //
                         "tree : 039c501ac8dfcac91c6f05601cee876e1cc07e17\n" + //
                         "tree : a1f239cbcd40f722555acfc7d23be06dee9d815e");
+    }
+
+    @Test
+    @DisplayName("Verify add directory works")
+    //empty folder
+    void testAddDirectoryCase1() throws Exception{
+        Tree tree = new Tree();
+        File path = new File("textFolder1");
+        path.mkdirs();
+        
+        //actual SHA1
+        String actualSHA = tree.addDirectory("textFolder1");
+        
+        //expected SHA1
+        String expectedSHA = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+
+        //if file exist
+
+        File file = new File("objects/da39a3ee5e6b4b0d3255bfef95601890afd80709");
+
+        assertEquals(actualSHA, expectedSHA);
+        assertTrue(file.exists());
+    }
+
+        @Test
+    @DisplayName("Verify add directory works")
+    //folder with two files
+    void testAddDirectoryCase2() throws Exception{
+        File path = new File("textFolder1");
+        path.mkdirs();
+        File file1 = new File("textFolder1/" + "testCase1");
+        Util.writeFile(file1.getName(), "this is the content for testCase1");
+        File file2 = new File("textFolder1/" + "testCase2");
+        Util.writeFile(file2.getName(), "this is the content for testCase2");
+        
+        
+    }
+        @Test
+    @DisplayName("Verify add directory works")
+    //folder with two files + one empty folder
+    void testAddDirectoryCase3() throws Exception{
+        File path = new File("textFolder1");
+        path.mkdirs();
+        File file1 = new File("textFolder1/" + "testCase1");
+        Util.writeFile(file1.getName(), "this is the content for testCase1");
+        File file2 = new File("textFolder1/" + "testCase2");
+        Util.writeFile(file2.getName(), "this is the content for testCase2");
+
+        File path1 = new File("textFolder1/textInsideFolder1");
+        path1.mkdirs();
+        
+    }
+        @Test
+    @DisplayName("Verify add directory works")
+    //folder with two files + one folder with two files
+    void testAddDirectoryCase4() throws Exception{
+       File path = new File("textFolder1");
+        path.mkdirs();
+        File file1 = new File("textFolder1/" + "testCase1");
+        Util.writeFile(file1.getName(), "this is the content for testCase1");
+        File file2 = new File("textFolder1/" + "testCase2");
+        Util.writeFile(file2.getName(), "this is the content for testCase2");
+
+        File path1 = new File("textFolder1/textInsideFolder1");
+        path1.mkdirs();
+        File file3 = new File("textFolder1/textInsideFolder1" + "testCase3");
+        Util.writeFile(file3.getName(), "this is the content for testCase3");
+        File file4 = new File("textFolder1/textInsideFolder1" + "testCase4");
+        Util.writeFile(file4.getName(), "this is the content for testCase4");
     }
 }

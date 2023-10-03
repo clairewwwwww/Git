@@ -104,16 +104,13 @@ public class Tree {
         }
         Index index = new Index();
         File [] dircetoryList = directory.listFiles();
-        if(dircetoryList == null)
-        {
-            add("tree : " + getSha1(content) + " : " + directoryPath);
-        }
         //go through everything in the folder
         for(File fileEntry : dircetoryList)
         {
             //if the entry is a folder
             if(fileEntry.isDirectory())
             {
+                content = "";
                 String folderName = directoryPath + "/" + fileEntry.getName();
                 addDirectory(folderName);
                 File tree = new File("objects/" + getSha1(content));
@@ -122,21 +119,23 @@ public class Tree {
                     fw.write(content);
                     fw.close();
                 }
-                String treeEntry = "tree : " + getSha1(Blob.readFile(folderName)) + " : " + fileEntry.getName();
+                String treeEntry = "tree : " + getSha1(content) + " : " + fileEntry.getName();
                 add(treeEntry);
             }
             //if the entry is a file
             else
             {
-                String fileName = directory.getName() + "/" + fileEntry.getName();
-                
+                String fileName = directoryPath + "/" + fileEntry.getName();
                 index.addBlob(fileName);
                 String blobEntry = "blob : " + getSha1(Blob.readFile(fileName)) + " : " + fileName;
                 add(blobEntry);
                 content += blobEntry + "\n";
             }
         }
-        content = content.substring(0, content.length() -1);
+        if(content != "")
+        {
+            content = content.substring(0, content.length() -1);
+        }
         return getSha1(content);
     }
 
