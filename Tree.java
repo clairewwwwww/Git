@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -95,32 +96,78 @@ public class Tree {
 
     public String addDirectory(String directoryPath) throws Exception
     {
-        String SHA1 = ""; //SHA1 - the saved Tree location in the objects folder
-        File directory = new File("directoryPath");
+        String content = ""; //SHA1 - the saved Tree location in the objects folder
+        File directory = new File(directoryPath);
+        if(!directory.isDirectory())
+        {
+            throw new Exception("Invalid directory path");
+        }
+        Index index = new Index();
+        File [] dircetoryList = directory.listFiles();
+        if(dircetoryList == null)
+        {
+            add("tree : " + getSha1(content) + " : " + directoryPath);
+        }
+        //go through everything in the folder
+        for(File fileEntry : dircetoryList)
+        {
+            //if the entry is a folder
+            if(fileEntry.isDirectory())
+            {
+                String folderName = directoryPath + "/" + fileEntry.getName();
+                addDirectory(folderName);
+                File tree = new File("objects/" + getSha1(content));
+                try (FileWriter fw = new FileWriter(tree)) 
+                {
+                    fw.write(content);
+                    fw.close();
+                }
+                String treeEntry = "tree : " + getSha1(Blob.readFile(folderName)) + " : " + fileEntry.getName();
+                add(treeEntry);
+            }
+            //if the entry is a file
+            else
+            {
+                String fileName = directory.getName() + "/" + fileEntry.getName();
+                
+                index.addBlob(fileName);
+                String blobEntry = "blob : " + getSha1(Blob.readFile(fileName)) + " : " + fileName;
+                add(blobEntry);
+                content += blobEntry + "\n";
+            }
+        }
+        content = content.substring(0, content.length() -1);
+        return getSha1(content);
+    }
+
+    /*public void addDirectoryHelper(String directoryPath) throws Exception
+    {
+        File directory = new File(directoryPath);
         if(!directory.isDirectory())
         {
             throw new Exception("Invalid directory path");
         }
         for(File fileEntry : directory.listFiles())
         {
+            //if the entry is a folder
             if(fileEntry.isDirectory())
             {
-                String folderName = fileEntry.getName();
-                String treeEntry = "tree : " + getSha1(Blob.readFile(fileEntry.getName()));
+                String folderName = directoryPath + "/" + fileEntry.getName();
+                addDirectoryHelper(folderName);
+                String treeEntry = "tree : " + getSha1(Blob.readFile(folderName)) + " : " + fileEntry.getName();
                 add(treeEntry);
-                addDirectory(folderName);
             }
+            //if the entry is a file
             else
             {
-                String fileName = fileEntry.getName();
-                Blob blob = new Blob (fileName);
+                String fileName = directoryPath + "/" + fileEntry.getName();
+                Blob blob = new Blob(fileName);
                 blob.createFile();
-                String blobEntry = "blob : " + getSha1(Blob.readFile(fileName)) + " : " + fileName;
-                add(blobEntry); 
+                String blobEntry = "blob : " + getSha1(Blob.readFile(fileName)) + " : " + fileEntry.getName();
+                add(blobEntry);
             }
         }
-        return SHA1;
-    }
+    }*/
 
     /* 
     public void listFilesForFolder(final File folder) 
