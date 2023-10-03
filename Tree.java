@@ -12,11 +12,13 @@ import java.util.Map;
 
 public class Tree {
     protected HashMap<String, String> blobMap;
+    protected HashMap<String, String> treeMap;
     protected HashSet<String> treeSet;
 
     public Tree() {
         blobMap = new HashMap<>();
         treeSet = new HashSet<>();
+        treeMap = new HashMap<>();
     }
 
     public void add(String addString) throws Exception {
@@ -68,12 +70,16 @@ public class Tree {
     public void writeToFile() throws IOException, NoSuchAlgorithmException {
         StringBuilder builder = new StringBuilder();
 
-        for (Map.Entry<String, String> entry : blobMap.entrySet()) {
-            builder.append("blob : " + entry.getValue() + " : " + entry.getKey() + "\n");
+        for (Map.Entry<String, String> entry1 : blobMap.entrySet()) {
+            builder.append("blob : " + entry1.getValue() + " : " + entry1.getKey() + "\n");
         }
 
         for (String hash : treeSet.toArray(new String[treeSet.size()])) {
             builder.append("tree : " + hash + "\n");
+        }
+
+        for (Map.Entry<String, String> entry2 : treeMap.entrySet()) {
+            builder.append("tree : " + entry2.getValue() + " : " + entry2.getKey() + "\n");
         }
 
         builder.deleteCharAt(builder.length() - 1);
