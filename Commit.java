@@ -11,7 +11,7 @@ public class Commit {
     private LinkedList<File> list;
     private File commit;
 
-    public Commit(String prevCommit, String author, String summary) throws NoSuchAlgorithmException, IOException {
+    public Commit(String prevCommit, String author, String summary) throws Exception {
         commit = new File("Commit");
         PrintWriter pw = new PrintWriter(commit);
         Tree tree = new Tree();
@@ -19,6 +19,20 @@ public class Commit {
         String date = getDate();
         pw.print(treeSha + '\n' + prevCommit + '\n' + '\n' + author + '\n' + date + '\n' + summary);
         pw.close();
+
+        String newEntry = "tree : " + tree.getSha1(Blob.readFile("Commit"));
+        tree.add(newEntry);
+        tree.writeToFile();
+
+    }
+
+    public String getTreeFromSHA(String SHA1ofCommit) throws IOException
+    {
+        File file = new File("objects", SHA1ofCommit);
+        BufferedReader firstLine = new BufferedReader(new FileReader(file));
+        String line = firstLine.readLine();
+        firstLine.close();
+        return line;
     }
 
     public String generateSha1(File f) throws NoSuchAlgorithmException, IOException {
