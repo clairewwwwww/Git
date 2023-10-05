@@ -42,9 +42,18 @@ public class Index {
     public void addBlob(String fileName) throws Exception {
         Blob blob = new Blob(fileName);
         blob.createFile();
-
         PrintWriter pw = new PrintWriter(new FileWriter("index", true));
-        pw.append(namePairs(fileName));
+        pw.append("blob : " + namePairs(fileName));
+        pw.append("\n");
+        pw.close();
+    }
+
+    public void addTree(String folderName) throws Exception
+    {
+        Tree tree = new Tree();
+        String SHA1 = tree.addDirectory(folderName);
+        PrintWriter pw = new PrintWriter(new FileWriter("index", true));
+        pw.append("tree : " + SHA1 + " : " + folderName);
         pw.append("\n");
         pw.close();
     }
@@ -75,6 +84,6 @@ public class Index {
 
     private String namePairs(String fileName) throws Exception {
         Blob blob = new Blob(fileName);
-        return fileName + " : " + blob.getSHA1String();
+        return blob.getSHA1String() + " : " + fileName;
     }
 }
