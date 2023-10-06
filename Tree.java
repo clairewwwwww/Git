@@ -15,11 +15,13 @@ public class Tree {
     protected HashMap<String, String> blobMap;
     protected HashMap<String, String> treeMap;
     protected HashSet<String> treeSet;
+    //private String content;
 
     public Tree() {
         blobMap = new HashMap<>();
         treeSet = new HashSet<>();
         treeMap = new HashMap<>();
+        //content = "";
     }
 
     public void add(String addString) throws Exception {
@@ -110,16 +112,17 @@ public class Tree {
             //if the entry is a folder
             if(fileEntry.isDirectory())
             {
-                content = "";
+                String temp = "";
                 String folderName = directoryPath + "/" + fileEntry.getName();
-                addDirectory(folderName);
-                File tree = new File("objects/" + getSha1(content));
+                String SHA = addDirectory(folderName);
+                File tree = new File("objects/" + SHA);
                 try (FileWriter fw = new FileWriter(tree)) 
                 {
                     fw.write(content);
                     fw.close();
                 }
-                String treeEntry = "tree : " + getSha1(content) + " : " + fileEntry.getName();
+                String treeEntry = "tree : " + SHA + " : " + folderName;
+                content += treeEntry + "\n";
                 add(treeEntry);
             }
             //if the entry is a file
@@ -134,7 +137,7 @@ public class Tree {
         }
         if(content != "")
         {
-            content = content.substring(0, content.length() -1);
+            content = content.substring(0, content.length() - 1);
         }
         return getSha1(content);
     }

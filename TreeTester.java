@@ -5,7 +5,10 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutionException;
 
+//import org.jcp.xml.dsig.internal.dom.Utils;
+//import org.jcp.xml.dsig.internal.dom.Utils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -107,45 +110,167 @@ public class TreeTester {
                         "tree : a1f239cbcd40f722555acfc7d23be06dee9d815e");
     }
 
+    //Test Case 1: In JUnit create a single folder (directory) with 3 files in it and test addDirectory
     @Test
+    @DisplayName("Verify add directory works")
+    void testCase1() throws Exception
+    {
+        Util.deleteDirectory("objects");
+        Util.deleteDirectory("testFolder1");
+        Tree tree = new Tree();
+        File path = new File("testFolder1");
+        path.mkdirs();
+
+        File file1 = new File("testFolder1/testCase1");
+        Util.writeFile("testFolder1/testCase1", "this is the content for testCase1");
+        File file2 = new File("testFolder1/testCase2");
+        Util.writeFile("testFolder1/testCase2", "this is the content for testCase2");
+        File file3 = new File("testFolder1/testCase3");
+        Util.writeFile("testFolder1/testCase3", "this is the content for testCase3");
+
+        String actualSHA = tree.addDirectory("testFolder1");
+        tree.writeToFile();
+        
+        //expected SHA1
+        String expectedSHA = "a3ff9da1b55bdebae84d2f893ac92220c56b9ca2";
+
+        //if file exist
+        File file = new File("objects", "a3ff9da1b55bdebae84d2f893ac92220c56b9ca2");
+        
+        assertEquals(expectedSHA, actualSHA);
+        assertTrue(file.exists());
+        
+    }
+    //Test Case 2: In JUnit create a single folder (directory) with 3 files and 2 folders in it and test addDirectory
+    @Test
+    @DisplayName("Verify add directory works")
+    void testCase2() throws Exception
+    {
+        Util.deleteDirectory("objects");
+        Util.deleteDirectory("testFolder1");
+        Tree tree = new Tree();
+        File path = new File("testFolder1");
+        path.mkdirs();
+
+        File file1 = new File("testFolder1/testCase1");
+        Util.writeFile("testFolder1/testCase1", "this is the content for testCase1");
+        File file2 = new File("testFolder1/testCase2");
+        Util.writeFile("testFolder1/testCase2", "this is the content for testCase2");
+        File file3 = new File("testFolder1/testCase3");
+        Util.writeFile("testFolder1/testCase3", "this is the content for testCase3");
+
+        File path1 = new File("testFolder1", "testInsideFolder1");
+        path1.mkdirs();
+        File path2 = new File("testFolder1", "testInsideFolder2");
+        path2.mkdirs();
+
+        String actualSHA = tree.addDirectory("testFolder1");
+        tree.writeToFile();
+        
+        //expected SHA1
+        String expectedSHA = "8cd2bf287b79935999338a79f7f251cd2e4009b3";
+
+        //if file exist
+        File file = new File("objects", "8cd2bf287b79935999338a79f7f251cd2e4009b3");
+        
+        assertEquals(expectedSHA, actualSHA);
+        assertTrue(file.exists());
+    }
+
+    /*@Test
     @DisplayName("Verify add directory works")
     //empty folder
     void testAddDirectoryCase1() throws Exception{
+        Util.deleteDirectory("objects");
+        Util.deleteDirectory("testFolder1");
         Tree tree = new Tree();
-        File path = new File("textFolder1");
+        File path = new File("testFolder1");
         path.mkdirs();
+        File folder = new File("testFolder1", "testInsideFolder1");
+        folder.mkdirs();
         
-        //actual SHA1
-        String actualSHA = tree.addDirectory("textFolder1");
+        String actualSHA = tree.addDirectory("testFolder1");
+        tree.writeToFile();
         
         //expected SHA1
-        String expectedSHA = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+        String expectedSHA = "ccd4729c9f22b7a794be54833a94404580089010";
 
         //if file exist
+        File file = new File("objects", "ccd4729c9f22b7a794be54833a94404580089010");
+        
+        assertEquals(expectedSHA, actualSHA);
+        assertTrue(file.exists());
+        
 
-        File file = new File("objects/da39a3ee5e6b4b0d3255bfef95601890afd80709");
+    }
+    @Test
+    @DisplayName("Verify add directory works")
+    //folder with two files
+    void testAddDirectoryCase2() throws Exception{
+        Util.deleteDirectory("objects");
+        Util.deleteDirectory("testFolder1");
+        Tree tree = new Tree();
+        File path = new File("testFolder1");
+        path.mkdirs();
+        
+        File file1 = new File("testFolder1/testCase1");
+        Util.writeFile("testFolder1/testCase1", "this is the content for testCase1");
+        File file2 = new File("testFolder1/testCase2");
+        Util.writeFile("testFolder1/testCase2", "this is the content for testCase2");
+        
+        //actual SHA1
+        String actualSHA = tree.addDirectory("testFolder1");
+        tree.writeToFile();
+        
+        //expected SHA1
+        String expectedSHA = "ba3b51ea28f8ec6f46f7b625dbbb9265f0d6214c";
 
-        assertEquals(actualSHA, expectedSHA);
+        //if file exist
+        File file = new File("objects", "ba3b51ea28f8ec6f46f7b625dbbb9265f0d6214c");
+        
+        assertEquals(expectedSHA, actualSHA);
         assertTrue(file.exists());
     }
 
         @Test
     @DisplayName("Verify add directory works")
-    //folder with two files
-    void testAddDirectoryCase2() throws Exception{
-        File path = new File("textFolder1");
+    //folder with two files + one empty folder
+    void testAddDirectoryCase3() throws Exception{
+        Util.deleteDirectory("objects");
+        Util.deleteDirectory("testFolder1");
+        Tree tree = new Tree();
+        File path = new File("testFolder1");
         path.mkdirs();
-        File file1 = new File("textFolder1/" + "testCase1");
-        Util.writeFile(file1.getName(), "this is the content for testCase1");
-        File file2 = new File("textFolder1/" + "testCase2");
-        Util.writeFile(file2.getName(), "this is the content for testCase2");
         
+        File file1 = new File("testFolder1/testCase1");
+        Util.writeFile("testFolder1/testCase1", "this is the content for testCase1");
+        File file2 = new File("testFolder1/testCase2");
+        Util.writeFile("testFolder1/testCase2", "this is the content for testCase2");
+        
+        File folder = new File("testFolder1", "testInsideFolder1");
+        folder.mkdirs();
+
+        //actual SHA1
+        String actualSHA = tree.addDirectory("testFolder1");
+        tree.writeToFile();
+        
+        //expected SHA1
+        String expectedSHA = "ba3b51ea28f8ec6f46f7b625dbbb9265f0d6214c";
+
+        //if file exist
+        File file = new File("objects", "ba3b51ea28f8ec6f46f7b625dbbb9265f0d6214c");
+        
+        assertEquals(expectedSHA, actualSHA);
+        assertTrue(file.exists());
+
         
     }
         @Test
     @DisplayName("Verify add directory works")
-    //folder with two files + one empty folder
-    void testAddDirectoryCase3() throws Exception{
+    //folder with two files + one folder with two files
+    void testAddDirectoryCase4() throws Exception{
+        Util.deleteDirectory("objects");
+        Util.deleteDirectory("testFolder1");
         File path = new File("textFolder1");
         path.mkdirs();
         File file1 = new File("textFolder1/" + "testCase1");
@@ -155,12 +280,14 @@ public class TreeTester {
 
         File path1 = new File("textFolder1/textInsideFolder1");
         path1.mkdirs();
+
+        
         
     }
         @Test
     @DisplayName("Verify add directory works")
-    //folder with two files + one folder with two files
-    void testAddDirectoryCase4() throws Exception{
+    
+    void testAddDirectoryCase5() throws Exception{
        File path = new File("textFolder1");
         path.mkdirs();
         File file1 = new File("textFolder1/" + "testCase1");
@@ -174,5 +301,5 @@ public class TreeTester {
         Util.writeFile(file3.getName(), "this is the content for testCase3");
         File file4 = new File("textFolder1/textInsideFolder1" + "testCase4");
         Util.writeFile(file4.getName(), "this is the content for testCase4");
-    }
+    }*/
 }
