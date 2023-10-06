@@ -10,12 +10,15 @@ import java.util.LinkedList;
 public class Commit {
     private LinkedList<File> list;
     private File commit;
+    private String prevCommit;
+    private String treeSha;
 
     public Commit(String prevCommit, String author, String summary) throws Exception {
+        this.prevCommit = prevCommit;
         commit = new File("Commit");
         PrintWriter pw = new PrintWriter(commit);
         Tree tree = new Tree();
-        String treeSha = tree.getSha1(Blob.readFile("Commit"));
+        treeSha = tree.getSha1(Blob.readFile("index"));
         String date = getDate();
         pw.print(treeSha + '\n' + prevCommit + '\n' + '\n' + author + '\n' + date + '\n' + summary);
         pw.close();
@@ -23,10 +26,35 @@ public class Commit {
         String newEntry = "tree : " + tree.getSha1(Blob.readFile("Commit"));
         tree.add(newEntry);
         tree.writeToFile();
-
     }
 
-    public String getTreeFromSHA(String SHA1ofCommit) throws IOException
+    
+
+    public void updatePrevious() throws IOException
+    {
+        String path = "objects/" + prevCommit;
+        File file = new File(path);
+        String content = "";
+        try (BufferedReader br = new BufferedReader(new FileReader(file));)
+        {
+            for(int i = 0; i < 2; i++)
+            {
+                content += br.readLine();
+            }
+            content += treeSha;
+            while(br.ready())
+            {
+                content += br.readLine();
+            }
+        } 
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }      
+        Util.writeFile(path, content);
+    }
+
+    public String getTreeFromSHA1(String SHA1ofCommit) throws IOException
     {
         File file = new File("objects", SHA1ofCommit);
         BufferedReader firstLine = new BufferedReader(new FileReader(file));
