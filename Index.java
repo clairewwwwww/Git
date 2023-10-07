@@ -43,7 +43,7 @@ public class Index {
         Blob blob = new Blob(fileName);
         blob.createFile();
         PrintWriter pw = new PrintWriter(new FileWriter("index", true));
-        pw.append("blob : " + namePairs(fileName));
+        pw.append("blob : " + Util.hashString(Blob.readFile(fileName)) + " : " + fileName);
         pw.append("\n");
         pw.close();
     }
@@ -71,7 +71,7 @@ public class Index {
     }
 
     private void removeLine(String lineContent) throws IOException {
-        File file = new File("Index");
+        File file = new File("index");
         File temp = new File("_temp_");
         PrintWriter out = new PrintWriter(new FileWriter(temp));
         Files.lines(file.toPath())
