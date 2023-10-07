@@ -15,7 +15,7 @@ public class Tree {
     protected HashMap<String, String> blobMap;
     protected HashMap<String, String> treeMap;
     protected HashSet<String> treeSet;
-    //private String content;
+    private String content;
 
     public Tree() {
         blobMap = new HashMap<>();
@@ -88,6 +88,7 @@ public class Tree {
         builder.deleteCharAt(builder.length() - 1);
 
         String result = builder.toString();
+        content = result;
         System.out.println(result);
         Util.writeFile("objects/" + Util.hashString(result), result);
     }
@@ -130,7 +131,7 @@ public class Tree {
             {
                 String fileName = directoryPath + "/" + fileEntry.getName();
                 index.addBlob(fileName);
-                String blobEntry = "blob : " + getSha1(Blob.readFile(fileName)) + " : " + fileName;
+                String blobEntry = "blob : " + getSha1(Util.readFile(fileName)) + " : " + fileName;
                 add(blobEntry);
                 content += blobEntry + "\n";
             }
