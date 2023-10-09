@@ -32,6 +32,7 @@ public class CommitTest
 
         BufferedReader read = new BufferedReader(new FileReader(file));
         actual = read.readLine();
+        read.close();
 
         assertEquals(expected, actual);
 
