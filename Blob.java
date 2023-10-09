@@ -27,7 +27,7 @@ public class Blob {
         if (!file.exists()) {
             throw new FileNotFoundException();
         }
-        this.sha1String = Util.hashString(readFile(fileName));
+        this.sha1String = Util.hashString(Util.readFile(fileName));
     }
 
     public void createFile() throws Exception {

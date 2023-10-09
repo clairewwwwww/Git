@@ -11,35 +11,46 @@ import java.util.LinkedList;
 public class Commit {
     //private static final String Util = null;
     private LinkedList<File> list;
-    private File commit;
+    //private File commit;
     private String prevCommit;
     private String current;
     private String  treeSha;
 
     public Commit(String prevCommit, String author, String summary) throws Exception {
         this.prevCommit = prevCommit;
-        commit = new File("Commit");
-        PrintWriter pw = new PrintWriter(commit);
+        File commit = new File("Commit");
+        PrintWriter pw = new PrintWriter(new FileWriter(commit, false));
         //Tree tree = new Tree();
         treeSha = createTree();
         String date = getDate();
         current = treeSha + '\n' + prevCommit + '\n' + '\n' + author + '\n' + date + '\n' + summary;
         pw.print(current);
         pw.close();
+
+        File newFile = new File("objects/" + Util.hashString(current));
     }
 
     public String createTree() throws IOException, Exception
     {
-        /*Tree tree = new Tree();
+        Tree tree = new Tree();
         String content = Util.readFile("index");
-        content += "\ntree : " + treeSha;
-        String fileName = Util.hashString(content);
-        File file = new File("objects", fileName);
+        if(content != "")
+        {
+            content = content.substring(0, content.length() - 1);
+        }
+        if(prevCommit != null)
+        {
+            content += "\ntree : " + prevCommit;
+        }
+        String fileName = "objects/" + Util.hashString(content);
+        File file = new File(fileName);
         PrintWriter pw = new PrintWriter(new FileWriter(file), false);
         pw.write(content);
         pw.close();
+
         Index index = new Index();
-        index.addBlob(fileName);*/
+        index.addBlob(fileName);
+        /* 
         Tree tree = new Tree();
         BufferedReader br = new BufferedReader(new FileReader("index"));
         String content = "";
@@ -49,13 +60,17 @@ public class Commit {
             content += br.readLine();
         }
         br.close();
-        tree.add("tree : " + prevCommit);
-        tree.writeToFile();
-        content += "\ntree : " + prevCommit;
+        if(prevCommit != null)
+        {
+            tree.add("tree : " + prevCommit);
+            content += "\ntree : " + prevCommit;
+        }
+        tree.writeToFile();*/
+        
 
         String SHA = Util.hashString(content);
 
-        Util.writeFile(SHA, content);
+        //Util.writeFile(SHA, content);
 
         PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
         overwrite.write("");
