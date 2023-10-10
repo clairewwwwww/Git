@@ -61,6 +61,9 @@ public class CommitTest
     @DisplayName("creates 1 commit")
     void testCase1() throws Exception
     {
+        Util.deleteDirectory("objects");
+        Util.deleteDirectory("testFolder1");
+        Util.deleteFile("index");
         //add two files
         File file1 = new File("testCase1");
         Util.writeFile("testCase1", "this is the content for testCase1");
@@ -238,7 +241,7 @@ public class CommitTest
         // "testing commit 2", Util.readFile(commit2File.getAbsolutePath()));
     }
 
-    public void case4SetUp() throws Exception
+    public void case3SetUp() throws Exception
     {
         Util.deleteDirectory("objects");
         Util.deleteDirectory("testFolder1");
@@ -310,14 +313,140 @@ public class CommitTest
     @Test
     @DisplayName("creates 4 commit")
     /*
-    1. Create a test which creates 2 commits 
-    2. Include at least 2 added files into each commit
-    3. Include at least 1 folder in one of the commits
-    4. Verify the commits have correct Tree, Prev and Next SHA1s
-    5. Verify the Tree contents are correct */
+    1. Create a test which creates 4 commits
+    2. Each commit must contain at least 2 new files, all of which have unique file data
+    3. 2 Commits must contain at least one new folder
+    4. Test tree contents, commit contents for prev and next and trees*/
     void testCase3() throws Exception
     {
+        case3SetUp();
+        //content
+        // blob : b43170f3ce583d5aa4cf796bcba18bf4dfb47a84 : testCase1
+        // blob : 475b6b0f321c21893de9d2a828d399f22e341fec : testCase2
+        String tree1SHA = "9644dcc839e35631be3d1d6ea3eed804d513033a";
+        File commit1Tree = new File("objects/9644dcc839e35631be3d1d6ea3eed804d513033a");
+        assertTrue(commit1Tree.exists());
+        assertEquals("blob : b43170f3ce583d5aa4cf796bcba18bf4dfb47a84 : testCase1\n" + 
+        "blob : 475b6b0f321c21893de9d2a828d399f22e341fec : testCase2", Util.readFile(commit1Tree.getAbsolutePath()));
 
+        //content
+        // blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3
+        // blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4
+        // tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1
+        // tree : da96b6a03d51e6378e5951470c2726b4893ab6f3
+        String tree2SHA = "964f8d3432d2d4f20c5f0c276f845e39d7f7f852";
+        File commit2Tree = new File("objects/964f8d3432d2d4f20c5f0c276f845e39d7f7f852");
+        assertTrue(commit2Tree.exists());
+        assertEquals("blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3\n" +
+        "blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4\n" + 
+        "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1\n" +
+        "tree : da96b6a03d51e6378e5951470c2726b4893ab6f3", Util.readFile(commit2Tree.getAbsolutePath()));
+
+        //content 
+        // blob : 427cb1dcd72fd646c81c7d71ecb80008ab855003 : testCase5
+        // blob : 3619e67c8c8bdb48c096bf767f319c7f2d6e7b6b : testCase6
+        // tree : d13808e90ea5f6ae212b088f6dbf439895adb4d1
+        String tree3SHA = "1528484ebe724d547a6b0f76e8df760653a2978d";
+        File commit3Tree = new File("objects/1528484ebe724d547a6b0f76e8df760653a2978d");
+        assertTrue(commit3Tree.exists());
+        assertEquals("blob : 427cb1dcd72fd646c81c7d71ecb80008ab855003 : testCase5\n" + 
+        "blob : 3619e67c8c8bdb48c096bf767f319c7f2d6e7b6b : testCase6\n" +
+        "tree : d13808e90ea5f6ae212b088f6dbf439895adb4d1", Util.readFile(commit3Tree.getAbsolutePath()));
+
+        //content
+        //blob : 13df75729db599b9da266be79a431547838a5932 : testCase7
+        //blob : f08eada325e3ae1d1bd62c66f5c930e441550f96 : testCase8
+        //tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1
+        //tree : cd0ee33ea4d8efcb8c7d87891b6d68f32bc04be8
+        String tree4SHA = "5fe7bdb7fb8c5a73d29d5bce3b109e23beb9dc9a";
+        File commit4Tree = new File("objects/5fe7bdb7fb8c5a73d29d5bce3b109e23beb9dc9a");
+        assertTrue(commit4Tree.exists());
+        assertEquals("blob : 13df75729db599b9da266be79a431547838a5932 : testCase7\n" +
+        "blob : f08eada325e3ae1d1bd62c66f5c930e441550f96 : testCase8\n" +
+        "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1\n" +
+        "tree : cd0ee33ea4d8efcb8c7d87891b6d68f32bc04be8", Util.readFile(commit4Tree.getAbsolutePath()));
+
+        /*
+        SHA --> da96b6a03d51e6378e5951470c2726b4893ab6f3
+        //content
+        9644dcc839e35631be3d1d6ea3eed804d513033a
+        null
+        null
+        claire
+        Oct 10, 2023
+        testing commit 1 */
+        String commit1SHA = "da96b6a03d51e6378e5951470c2726b4893ab6f3";
+        File commit1 = new File("objects/da96b6a03d51e6378e5951470c2726b4893ab6f3");
+        assertTrue(commit1.exists());
+
+        String actualPrev1 = getLine(commit1, 1);
+        String expectedPrev1 = "null";
+        assertEquals(actualPrev1, expectedPrev1);
+
+        String actualNext = getLine(commit1, 2);
+        String expectedNext = "d13808e90ea5f6ae212b088f6dbf439895adb4d1";
+        assertEquals(actualNext, expectedNext);
+
+        /*
+        SHA --> d13808e90ea5f6ae212b088f6dbf439895adb4d1
+        964f8d3432d2d4f20c5f0c276f845e39d7f7f852
+        da96b6a03d51e6378e5951470c2726b4893ab6f3
+        null
+        claire
+        Oct 10, 2023
+        testing commit 2 */
+        String commit2SHA = "d13808e90ea5f6ae212b088f6dbf439895adb4d1";
+        File commit2 = new File("objects/d13808e90ea5f6ae212b088f6dbf439895adb4d1");
+        assertTrue(commit2.exists());
+
+        String actualPrev2 = getLine(commit2, 1);
+        String expectedPrev2 = "da96b6a03d51e6378e5951470c2726b4893ab6f3";
+        assertEquals(actualPrev2, expectedPrev2);
+
+        String actualNext2 = getLine(commit2, 2);
+        String expectedNext2 = "cd0ee33ea4d8efcb8c7d87891b6d68f32bc04be8";
+        assertEquals(actualNext2, expectedNext2);
+
+
+        /*
+        SHA --> cd0ee33ea4d8efcb8c7d87891b6d68f32bc04be8
+        1528484ebe724d547a6b0f76e8df760653a2978d
+        d13808e90ea5f6ae212b088f6dbf439895adb4d1
+        null
+        claire
+        Oct 10, 2023
+        testing commit 3*/
+        String commit3SHA = "cd0ee33ea4d8efcb8c7d87891b6d68f32bc04be8";
+        File commit3 = new File("objects/cd0ee33ea4d8efcb8c7d87891b6d68f32bc04be8");
+        assertTrue(commit3.exists());
+
+        String actualPrev3 = getLine(commit3, 1);
+        String expectedPrev3 = "d13808e90ea5f6ae212b088f6dbf439895adb4d1";
+        assertEquals(actualPrev3, expectedPrev3);
+
+        String actualNext3 = getLine(commit3, 2);
+        String expectedNext3 = "30051167a65ff690ad0fe817bfdfeeeb1de9963c";
+        assertEquals(actualNext3, expectedNext3);
+
+        /*
+        SHA --> 30051167a65ff690ad0fe817bfdfeeeb1de9963c
+        5fe7bdb7fb8c5a73d29d5bce3b109e23beb9dc9a
+        cd0ee33ea4d8efcb8c7d87891b6d68f32bc04be8
+        null
+        claire
+        Oct 10, 2023
+        testing commit 4 */
+        String commit4SHA = "30051167a65ff690ad0fe817bfdfeeeb1de9963c";
+        File commit4 = new File("objects/30051167a65ff690ad0fe817bfdfeeeb1de9963c");
+        assertTrue(commit4.exists());
+
+        String actualPrev4 = getLine(commit4, 1);
+        String expectedPrev4 = "cd0ee33ea4d8efcb8c7d87891b6d68f32bc04be8";
+        assertEquals(actualPrev4, expectedPrev4);
+
+        String actualNext4 = getLine(commit4, 2);
+        String expectedNext4 = "null";
+        assertEquals(actualNext4, expectedNext4);
 
     }
 
@@ -325,7 +454,7 @@ public class CommitTest
     void testGetDate() throws Exception 
     {
         Commit commit = new Commit(null, "claire", "testing commit 1");
-        assertEquals(commit.getDate(), "Oct 09, 2023");
+        assertEquals(commit.getDate(), "Oct 10, 2023");
     }
 
     public String getLine(File file, int numberOfLine) throws IOException
