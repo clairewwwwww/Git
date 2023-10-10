@@ -23,11 +23,12 @@ public class Commit {
         //Tree tree = new Tree();
         treeSha = createTree();
         String date = getDate();
-        current = treeSha + '\n' + prevCommit + '\n' + '\n' + author + '\n' + date + '\n' + summary;
+        current = treeSha + '\n' + prevCommit + '\n' + null + '\n' + author + '\n' + date + '\n' + summary;
         pw.print(current);
         pw.close();
 
         File newFile = new File("objects/" + Util.hashString(current));
+        commit.renameTo(newFile);
     }
 
     public String createTree() throws IOException, Exception
@@ -48,6 +49,8 @@ public class Commit {
         pw.write(content);
         pw.close();
 
+        String SHA = Util.hashString(content);
+
         Index index = new Index();
         index.addBlob(fileName);
         /* 
@@ -66,21 +69,16 @@ public class Commit {
             content += "\ntree : " + prevCommit;
         }
         tree.writeToFile();*/
-        
-
-        String SHA = Util.hashString(content);
 
         //Util.writeFile(SHA, content);
-
         PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
         overwrite.write("");
         overwrite.close();
-
         return SHA;
 
     }
 
-    public void updatePrevious() throws IOException, NoSuchAlgorithmException
+    public void updatePreviousCommit() throws IOException, NoSuchAlgorithmException
     {
         String path = "objects/" + prevCommit;
         File file = new File(path);
