@@ -29,6 +29,12 @@ public class Commit {
 
         File newFile = new File("objects/" + Util.hashString(current));
         commit.renameTo(newFile);
+        updatePreviousCommit();
+    }
+
+    public String getCurrentSHA() throws NoSuchAlgorithmException
+    {
+        return Util.hashString(current);
     }
 
     public String createTree() throws IOException, Exception
@@ -80,6 +86,10 @@ public class Commit {
 
     public void updatePreviousCommit() throws IOException, NoSuchAlgorithmException
     {
+        if(prevCommit == null)
+        {
+            return;
+        }
         String path = "objects/" + prevCommit;
         File file = new File(path);
         String content = "";
@@ -88,10 +98,13 @@ public class Commit {
             for(int i = 0; i < 2; i++)
             {
                 content += br.readLine();
+                content += "\n";
             }
             content += Util.hashString(current);
+            br.readLine();
             while(br.ready())
             {
+                content += "\n";
                 content += br.readLine();
             }
             br.close();
