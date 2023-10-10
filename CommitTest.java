@@ -272,15 +272,52 @@ public class CommitTest
         index2.addBlob("testCase4");
         index2.addTree("testFolder1");
 
+        Commit secondCommit = new Commit(commit1SHA, "claire", "testing commit 2");
 
-        Commit commit2 = new Commit(null, "claire", "testing commit 2");
+        //COMMIT three
+        //add two files
+        File file5 = new File("testCase5");
+        Util.writeFile("testCase5", "this is the content for testCase5");
+        File file6 = new File("testCase6");
+        Util.writeFile("testCase6", "this is the content for testCase6");
+
+        Index index3 = new Index();
+        index3.addBlob("testCase5");
+        index3.addBlob("testCase6");
+
+        String commit2SHA = secondCommit.getCurrentSHA();
+        Commit thirdCommit = new Commit(commit2SHA, "claire", "testing commit 3");
+        
+
+        //add two files and one folder
+        File file7 = new File("testCase7");
+        Util.writeFile("testCase7", "this is the content for testCase7");
+        File file8 = new File("testCase8");
+        Util.writeFile("testCase8", "this is the content for testCase8");
+        File folder2 = new File("testFolder2");
+        folder1.mkdirs();
+
+        Index index4= new Index();
+        index4.addBlob("testCase7");
+        index4.addBlob("testCase8");
+        index4.addTree("testFolder1");
+
+        String commit3SHA = thirdCommit.getCurrentSHA();
+        Commit fourthCommit = new Commit(commit3SHA, "claire", "testing commit 4");
 
     }
 
     @Test
     @DisplayName("creates 4 commit")
+    /*
+    1. Create a test which creates 2 commits 
+    2. Include at least 2 added files into each commit
+    3. Include at least 1 folder in one of the commits
+    4. Verify the commits have correct Tree, Prev and Next SHA1s
+    5. Verify the Tree contents are correct */
     void testCase3() throws Exception
     {
+
 
     }
 
@@ -288,6 +325,26 @@ public class CommitTest
     void testGetDate() throws Exception 
     {
         Commit commit = new Commit(null, "claire", "testing commit 1");
-        assertEquals(commit.getDate(), "Oct 07, 2023");
+        assertEquals(commit.getDate(), "Oct 09, 2023");
+    }
+
+    public String getLine(File file, int numberOfLine) throws IOException
+    {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        int count = 0;
+        String result = "";
+        while(br.ready())
+        {
+            if(count == numberOfLine)
+            {
+                result = br.readLine();
+                br.close();
+                return result;
+            }
+            br.readLine();
+            count++;
+        }
+        br.close();
+        return result;
     }
 }
