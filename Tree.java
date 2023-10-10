@@ -15,7 +15,7 @@ public class Tree {
     protected HashMap<String, String> blobMap;
     protected HashMap<String, String> treeMap;
     protected HashSet<String> treeSet;
-    private String content;
+    //private String content;
 
     public Tree() {
         blobMap = new HashMap<>();
@@ -88,16 +88,23 @@ public class Tree {
         builder.deleteCharAt(builder.length() - 1);
 
         String result = builder.toString();
-        content = result;
+        String finalSha = Util.hashString(result);
+        //content = result;
         System.out.println(result);
-        Util.writeFile("objects/" + Util.hashString(result), result);
+        
+        Util.writeFile("objects/" + finalSha, result);
     }
 
     public String getSha1(String input) throws IOException, NoSuchAlgorithmException {
         return Util.hashString(input);
     }
 
-    public String addDirectory(String directoryPath) throws Exception
+    public String addDirectory(String directoryPath) throws NoSuchAlgorithmException, Exception
+    {
+        return getSha1(addDirectoryHelper(directoryPath));
+    }
+
+    public String addDirectoryHelper(String directoryPath) throws Exception
     {
         String content = ""; //SHA1 - the saved Tree location in the objects folder
         File directory = new File(directoryPath);
@@ -115,16 +122,17 @@ public class Tree {
             {
                 String temp = "";
                 String folderName = directoryPath + "/" + fileEntry.getName();
-                String SHA = addDirectory(folderName);
+                String fileContent = addDirectoryHelper(folderName);
+                String SHA = Util.hashString(fileContent);
                 File tree = new File("objects/" + SHA);
                 try (FileWriter fw = new FileWriter(tree)) 
                 {
-                    fw.write(content);
+                    fw.write(fileContent);
                     fw.close();
                 }
                 String treeEntry = "tree : " + SHA + " : " + folderName;
-                content += treeEntry + "\n";
                 add(treeEntry);
+                content += treeEntry + "\n";
             }
             //if the entry is a file
             else
@@ -140,7 +148,7 @@ public class Tree {
         {
             content = content.substring(0, content.length() - 1);
         }
-        return getSha1(content);
+        return content;
     }
 
     /*public void addDirectoryHelper(String directoryPath) throws Exception

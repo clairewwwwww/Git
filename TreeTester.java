@@ -159,16 +159,23 @@ public class TreeTester {
         File file3 = new File("testFolder1/testCase3");
         Util.writeFile("testFolder1/testCase3", "this is the content for testCase3");
 
-        File path1 = new File("testFolder1", "testInsideFolder1");
+        File path1 = new File("testFolder1/testInsideFolder1");
         path1.mkdirs();
-        File path2 = new File("testFolder1", "testInsideFolder2");
+        File path2 = new File("testFolder1/testInsideFolder2");
         path2.mkdirs();
 
         String actualSHA = tree.addDirectory("testFolder1");
         tree.writeToFile();
+        /* sha: e326ca009314ec2e3878ff0b761239973e514009
+         *  blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testFolder1/testCase3
+            blob : 475b6b0f321c21893de9d2a828d399f22e341fec : testFolder1/testCase2
+            tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1/testInsideFolder2
+            tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1/testInsideFolder1
+            blob : b43170f3ce583d5aa4cf796bcba18bf4dfb47a84 : testFolder1/testCase1
+         */
         
         //expected SHA1
-        String expectedSHA = "8cd2bf287b79935999338a79f7f251cd2e4009b3";
+        String expectedSHA = "e326ca009314ec2e3878ff0b761239973e514009";
 
         //if file exist
         File file = new File("objects", "8cd2bf287b79935999338a79f7f251cd2e4009b3");
@@ -177,7 +184,7 @@ public class TreeTester {
         assertTrue(file.exists());
     }
 
-    /*@Test
+    @Test
     @DisplayName("Verify add directory works")
     //empty folder
     void testAddDirectoryCase1() throws Exception{
@@ -255,51 +262,66 @@ public class TreeTester {
         tree.writeToFile();
         
         //expected SHA1
-        String expectedSHA = "ba3b51ea28f8ec6f46f7b625dbbb9265f0d6214c";
+        String expectedSHA = "b438bcecef0d451f17a29b025755c65ca92b05ed";
+        //Sha of
+        // blob : 475b6b0f321c21893de9d2a828d399f22e341fec : testFolder1/testCase2
+        // tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1/testInsideFolder1
+        // blob : b43170f3ce583d5aa4cf796bcba18bf4dfb47a84 : testFolder1/testCase1
 
         //if file exist
-        File file = new File("objects", "ba3b51ea28f8ec6f46f7b625dbbb9265f0d6214c");
+        File file = new File("objects", "3d6ef5f7b8deb35daa6b4e8ba36d78d551026c2e");
         
         assertEquals(expectedSHA, actualSHA);
         assertTrue(file.exists());
-
-        
     }
         @Test
     @DisplayName("Verify add directory works")
     //folder with two files + one folder with two files
     void testAddDirectoryCase4() throws Exception{
-        Util.deleteDirectory("objects");
+       Util.deleteDirectory("objects");
         Util.deleteDirectory("testFolder1");
-        File path = new File("textFolder1");
+
+        Tree tree = new Tree();
+        File path = new File("testFolder1");
         path.mkdirs();
-        File file1 = new File("textFolder1/" + "testCase1");
-        Util.writeFile(file1.getName(), "this is the content for testCase1");
-        File file2 = new File("textFolder1/" + "testCase2");
-        Util.writeFile(file2.getName(), "this is the content for testCase2");
 
-        File path1 = new File("textFolder1/textInsideFolder1");
+        String name1 = "testFolder1/testCase1";
+        File file1 = new File(name1);
+        Util.writeFile(name1, "this is the content for testCase1");
+        //blob : b43170f3ce583d5aa4cf796bcba18bf4dfb47a84 : testFolder1/testCase1
+
+        String name2 = "testFolder1/testCase2";
+        File file2 = new File(name2);
+        Util.writeFile(name2, "this is the content for testCase2");
+        //blob : 475b6b0f321c21893de9d2a828d399f22e341fec : testFolder1/testCase2
+
+        String insideFolder = "testFolder1/testInsideFolder1";
+        File path1 = new File(insideFolder);
         path1.mkdirs();
+        //tree : 77b44a6a3c547328cb87eadda65a35d4c60a5418 : testFolder1/testInsideFolder1
 
+        String name3 = insideFolder + "/testCase3";
+        File file3 = new File(name3);
+        Util.writeFile(name3, "this is the content for testCase3");
+        //blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testFolder1/testInsideFolder1/testCase3
+
+        String name4 = insideFolder + "/testCase4";
+        File file4 = new File(name4);
+        Util.writeFile(name4, "this is the content for testCase4");
+        //blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testFolder1/testInsideFolder1/testCase4
+
+
+        //actual SHA1
+        String actualSHA = tree.addDirectory("testFolder1");
+        tree.writeToFile();
         
+        //expected SHA1
+        String expectedSHA = "ae8c5e8963e1508cf739b0854cb503464d68ba95";
+
+        //if file exist
+        File file = new File("objects", "09a7ba25f3cc2b0252a4d35863d238da5db62e15");
         
+        assertEquals(expectedSHA, actualSHA);
+        assertTrue(file.exists());
     }
-        @Test
-    @DisplayName("Verify add directory works")
-    
-    void testAddDirectoryCase5() throws Exception{
-       File path = new File("textFolder1");
-        path.mkdirs();
-        File file1 = new File("textFolder1/" + "testCase1");
-        Util.writeFile(file1.getName(), "this is the content for testCase1");
-        File file2 = new File("textFolder1/" + "testCase2");
-        Util.writeFile(file2.getName(), "this is the content for testCase2");
-
-        File path1 = new File("textFolder1/textInsideFolder1");
-        path1.mkdirs();
-        File file3 = new File("textFolder1/textInsideFolder1" + "testCase3");
-        Util.writeFile(file3.getName(), "this is the content for testCase3");
-        File file4 = new File("textFolder1/textInsideFolder1" + "testCase4");
-        Util.writeFile(file4.getName(), "this is the content for testCase4");
-    }*/
 }
