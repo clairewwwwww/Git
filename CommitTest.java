@@ -83,14 +83,18 @@ public class CommitTest
         //blob : 475b6b0f321c21893de9d2a828d399f22e341fec : testCase2
         File indexFile = new File("objects/9644dcc839e35631be3d1d6ea3eed804d513033a");
         assertTrue(indexFile.exists());
-        //sha --> 
-        /*3ca52142514636c9dc41e3d65ae79c86183a5dce
+        
+        //sha --> da96b6a03d51e6378e5951470c2726b4893ab6f3
+        /*
+        9644dcc839e35631be3d1d6ea3eed804d513033a
         null
         null
         claire
-        Oct 09, 2023
+        Oct 10, 2023
         testing commit 1 */
-        File commitFile = new File("objects/3ca52142514636c9dc41e3d65ae79c86183a5dce");
+
+        //Verify the commit has correct SHA1s
+        File commitFile = new File("objects/da96b6a03d51e6378e5951470c2726b4893ab6f3");
         assertTrue(commitFile.exists());
 
         //Verify the commit has correct Tree
@@ -99,18 +103,16 @@ public class CommitTest
         String expectedTree = "9644dcc839e35631be3d1d6ea3eed804d513033a";
         assertEquals(expectedTree, actualTree);
 
+        
         //Verify the commit has correct Prev
-        Util.readFile("objects/" + "3ca52142514636c9dc41e3d65ae79c86183a5dce");
+        Util.readFile("objects/" + "da96b6a03d51e6378e5951470c2726b4893ab6f3");
         String actualPrev = read.readLine();
         String expectedPrev = "null";
         assertEquals(actualPrev, expectedPrev);
 
-        //Verify the commit has correct SHA1s
-        assertTrue(commitFile.exists());
 
         read.close();
     }
-
     
     public void case2SetUp() throws Exception
     {
@@ -167,21 +169,9 @@ public class CommitTest
         "blob : 475b6b0f321c21893de9d2a828d399f22e341fec : testCase2", Util.readFile(commit1Tree.getAbsolutePath()));
 
 
-        //check commit2 tree
-        //sha --> 4b4933965bdfe1dd29f0de3b4dd74f6e4d756607
-        /*
-        blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3
-        blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4
-        tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1
-        tree : 3ca52142514636c9dc41e3d65ae79c86183a5dce 
-        */
-        File commit2Tree = new File("objects/4b4933965bdfe1dd29f0de3b4dd74f6e4d756607");
-        assertTrue(commit2Tree.exists());
-        assertEquals("blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3\n" +
-        "blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4\n" +
-        "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1\n" +
-        "tree : 3ca52142514636c9dc41e3d65ae79c86183a5dce", Util.readFile(commit2Tree.getAbsolutePath()));
-
+        String content = getBasicContent("9644dcc839e35631be3d1d6ea3eed804d513033a", null, null, 1);
+        String commit1SHA = Util.hashString(content);
+        //System.out.print(commit1SHA);
         //check commit1 commit
         //sha --> 3ca52142514636c9dc41e3d65ae79c86183a5dce
         /*
@@ -189,17 +179,42 @@ public class CommitTest
         null
         b784879f83097356bff6a9a08db8bc2ffb3721cc (null)(yes next commit, but sha no change)
         claire
-        Oct 09, 2023
+        Oct 10, 2023
         testing commit 1 */
-        File commit1File = new File("objects/3ca52142514636c9dc41e3d65ae79c86183a5dce");
+        File commit1File = new File("objects/" + commit1SHA);
         assertTrue(commit1File.exists());
         String actualPrev = getLine(commit1File, 1);
         String expectedPrev = "null";
         assertEquals(actualPrev, expectedPrev);
 
+
+        String commit2TreeSHA = Util.hashString("blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3\n" +
+        "blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4\n" +
+        "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1\n" +
+        "tree : " + commit1SHA);
+        File commit2Tree = new File("objects/" + commit2TreeSHA);
+        assertTrue(commit2Tree.exists());
+        assertEquals("blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3\n" +
+        "blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4\n" +
+        "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1\n" +
+        "tree : " + commit1SHA, Util.readFile(commit2Tree.getAbsolutePath()));
+
+        String commit2SHA = Util.hashString(getBasicContent(commit2TreeSHA, commit1SHA, null, 2));
+
         String actualNext = getLine(commit1File, 2);
-        String expectedNext = "b784879f83097356bff6a9a08db8bc2ffb3721cc";
+        String expectedNext = commit2SHA;
         assertEquals(actualNext, expectedNext);
+
+        
+
+        //check commit2 tree
+        //sha --> 4b4933965bdfe1dd29f0de3b4dd74f6e4d756607
+        /*
+        blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3
+        blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4
+        tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1
+        tree : (commit1SHA)
+        */
 
 
         // assertEquals(
@@ -221,10 +236,10 @@ public class CommitTest
         Oct 09, 2023
         testing commit 2 */
 
-        File commit2File = new File("objects/b784879f83097356bff6a9a08db8bc2ffb3721cc");
+        File commit2File = new File("objects/" + commit2SHA);
         assertTrue(commit2File.exists());
         String actualPrev2 = getLine(commit2File, 1);
-        String expectedPrev2 = "3ca52142514636c9dc41e3d65ae79c86183a5dce";
+        String expectedPrev2 = commit1SHA;
         assertEquals(actualPrev2, expectedPrev2);
 
         String actualNext2 = getLine(commit2File, 2);
@@ -476,4 +491,17 @@ public class CommitTest
         br.close();
         return result;
     }
+
+    public String getBasicContent(String treeSHA, String previousCommit, String nextCommit, int numOfCommit) throws Exception
+    {
+        Commit commit = new Commit(null, null, null);
+        String result = treeSHA + "\n"
+        + previousCommit + "\n" 
+        + nextCommit + "\n" 
+        + "claire" + "\n"
+        + commit.getDate() + "\n"
+        + "testing commit" + " " + numOfCommit;
+        return result;
+    }
+
 }
