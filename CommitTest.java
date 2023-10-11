@@ -287,12 +287,12 @@ public class CommitTest
         File file8 = new File("testCase8");
         Util.writeFile("testCase8", "this is the content for testCase8");
         File folder2 = new File("testFolder2");
-        folder1.mkdirs();
+        folder2.mkdirs();
 
         Index index4= new Index();
         index4.addBlob("testCase7");
         index4.addBlob("testCase8");
-        index4.addTree("testFolder1");
+        index4.addTree("testFolder2");
 
         String commit3SHA = thirdCommit.getCurrentSHA();
         Commit fourthCommit = new Commit(commit3SHA, "claire", "testing commit 4");
@@ -341,7 +341,7 @@ public class CommitTest
 
         String expectedTree4Content = "blob : 13df75729db599b9da266be79a431547838a5932 : testCase7\n" +
         "blob : f08eada325e3ae1d1bd62c66f5c930e441550f96 : testCase8\n" +
-        "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1\n" +
+        "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder2\n" +
         "tree : " + expectedCommit3SHA;
         String expectedTree4SHA = Util.hashString(expectedTree4Content);
 
@@ -404,8 +404,7 @@ public class CommitTest
     @Test
     void testGetDate() throws Exception 
     {
-        Commit commit = new Commit(null, "claire", "testing commit 1");
-        assertEquals(commit.getDate(), "Oct 10, 2023");
+        assertEquals(Commit.getDate(), "Oct 11, 2023");
     }
 
     public String getLine(File file, int numberOfLine) throws IOException
@@ -430,12 +429,11 @@ public class CommitTest
 
     public String getBasicContent(String treeSHA, String previousCommit, String nextCommit, int numOfCommit) throws Exception
     {
-        Commit commit = new Commit(null, null, null);
         String result = treeSHA + "\n"
         + previousCommit + "\n" 
         + nextCommit + "\n" 
         + "claire" + "\n"
-        + commit.getDate() + "\n"
+        + Commit.getDate() + "\n"
         + "testing commit" + " " + numOfCommit;
         return result;
     }
