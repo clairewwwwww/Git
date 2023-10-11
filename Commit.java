@@ -10,11 +10,11 @@ import java.util.LinkedList;
 
 public class Commit {
     //private static final String Util = null;
-    private LinkedList<File> list;
     //private File commit;
     private String prevCommit;
     private String current;
-    private String  treeSha;
+    private String treeSha;
+    private String head;
 
     public Commit(String prevCommit, String author, String summary) throws Exception {
         this.prevCommit = prevCommit;
@@ -27,9 +27,17 @@ public class Commit {
         pw.print(current);
         pw.close();
 
-        File newFile = new File("objects/" + Util.hashString(current));
+        String currentCommitSha = "objects/" + Util.hashString(current);
+        File newFile = new File(currentCommitSha);
+
         commit.renameTo(newFile);
+
         updatePreviousCommit();
+
+        File head = new File("HEAD");
+        PrintWriter pw2 = new PrintWriter(new FileWriter(head, false));
+        pw2.print(currentCommitSha);
+        pw2.close();
     }
 
     public String getCurrentSHA() throws NoSuchAlgorithmException
