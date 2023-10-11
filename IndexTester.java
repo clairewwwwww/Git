@@ -48,14 +48,14 @@ public class IndexTester {
         index.addBlob("testerFile.txt");
 
         // Confirming testerFile.txt was added to index
-        assertEquals("blob : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed : testerFile.txt\n", Util.readFile("index"));
+        assertEquals("blob : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed : testerFile.txt", Util.readFile("index"));
 
         index.addBlob("testerFile2.txt");
 
         // Confirming testerFile2.txt was added to index
         assertEquals(
                 "blob : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed : testerFile.txt\n" +
-                        "blob : 7e4fb4975ec34b65826fd95e60e628110dbef839 : testerFile2.txt\n",
+                        "blob : 7e4fb4975ec34b65826fd95e60e628110dbef839 : testerFile2.txt",
                 Util.readFile("index"));
     }
 
@@ -71,14 +71,14 @@ public class IndexTester {
         index.addBlob("testerFile.txt");
 
         // Confirming testerFile.txt was added to index
-        assertEquals("blob : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed : testerFile.txt\n", Util.readFile("index"));
+        assertEquals("blob : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed : testerFile.txt", Util.readFile("index"));
 
         index.addBlob("testerFile2.txt");
 
         // Confirming testerFile2.txt was added to index
         assertEquals(
                 "blob : 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed : testerFile.txt\n" +
-                        "blob : 7e4fb4975ec34b65826fd95e60e628110dbef839 : testerFile2.txt\n",
+                        "blob : 7e4fb4975ec34b65826fd95e60e628110dbef839 : testerFile2.txt",
                 Util.readFile("index"));
 
         index.removeBlob("testerFile.txt");

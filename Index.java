@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,12 +42,18 @@ public class Index {
     }
 
     public void addBlob(String fileName) throws Exception {
+        
         Blob blob = new Blob(fileName);
         blob.createFile();
         PrintWriter pw = new PrintWriter(new FileWriter("index", true));
+        BufferedReader br = new BufferedReader(new FileReader("index"));     
+        if (br.readLine() != null) 
+        {
+            pw.append("\n");
+        }
         pw.append("blob : " + Util.hashString(Blob.readFile(fileName)) + " : " + fileName);
-        pw.append("\n");
         pw.close();
+        br.close();
     }
 
     public void addTree(String folderName) throws Exception
@@ -53,8 +61,27 @@ public class Index {
         Tree tree = new Tree();
         String SHA1 = tree.addDirectory(folderName);
         PrintWriter pw = new PrintWriter(new FileWriter("index", true));
+        BufferedReader br = new BufferedReader(new FileReader("index"));     
+        if (br.readLine() != null) 
+        {
+            pw.append("\n");
+        }
         pw.append("tree : " + SHA1 + " : " + folderName);
-        pw.append("\n");
+        pw.close();
+        br.close();
+    }
+
+    public void delete(String fileName) throws IOException
+    {
+        PrintWriter pw = new PrintWriter(new FileWriter("index", true));
+        pw.append("*deleted*" + fileName);
+        pw.close();
+    }
+
+    public void edit(String fileName) throws IOException
+    {
+        PrintWriter pw = new PrintWriter(new FileWriter("index", true));
+        pw.append("*edited*" + fileName);
         pw.close();
     }
 
@@ -66,7 +93,7 @@ public class Index {
         } else {
             File doomedFile = new File("objects", blob.getSHA1String());
             doomedFile.delete();
-            removeLine(namePairs(fileName));
+            removeLine("blob : " + namePairs(fileName));
         }
     }
 
