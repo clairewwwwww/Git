@@ -17,13 +17,18 @@ public class Commit {
     private String head;
 
     public Commit(String prevCommit, String author, String summary) throws Exception {
-        this.prevCommit = prevCommit;
+       this.prevCommit = prevCommit;
         File commit = new File("Commit");
         PrintWriter pw = new PrintWriter(new FileWriter(commit, false));
         //Tree tree = new Tree();
         treeSha = createTree();
         String date = getDate();
-        current = treeSha + '\n' + prevCommit + '\n' + null + '\n' + author + '\n' + date + '\n' + summary;
+        String temp = prevCommit;
+        if(prevCommit == null)
+        {
+            temp = "";
+        }
+        current = treeSha + '\n' + temp + '\n' + '\n' + author + '\n' + date + '\n' + summary;
         pw.print(current);
         pw.close();
 
@@ -67,6 +72,14 @@ public class Commit {
 
         Index index = new Index();
         index.addBlob(fileName);
+
+        PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
+        overwrite.write("");
+        overwrite.close();
+        return SHA;
+
+
+        //other way
         /* 
         Tree tree = new Tree();
         BufferedReader br = new BufferedReader(new FileReader("index"));
@@ -85,11 +98,7 @@ public class Commit {
         tree.writeToFile();*/
 
         //Util.writeFile(SHA, content);
-        PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
-        overwrite.write("");
-        overwrite.close();
-        return SHA;
-
+    
     }
 
     public void updatePreviousCommit() throws IOException, NoSuchAlgorithmException
