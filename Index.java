@@ -59,29 +59,20 @@ public class Index {
     public void addTree(String folderName) throws Exception
     {
         Tree tree = new Tree();
-        String SHA1 = tree.addDirectory(folderName);
-        PrintWriter pw = new PrintWriter(new FileWriter("index", true));
-        BufferedReader br = new BufferedReader(new FileReader("index"));     
-        if (br.readLine() != null) 
-        {
-            pw.append("\n");
-        }
-        pw.append("tree : " + SHA1 + " : " + folderName);
-        pw.close();
-        br.close();
+        tree.addDirectory(folderName);
     }
 
     public void delete(String fileName) throws IOException
     {
         PrintWriter pw = new PrintWriter(new FileWriter("index", true));
-        pw.append("*deleted*" + fileName);
+        pw.append("\n*deleted*" + fileName);
         pw.close();
     }
 
     public void edit(String fileName) throws IOException
     {
         PrintWriter pw = new PrintWriter(new FileWriter("index", true));
-        pw.append("*edited*" + fileName);
+        pw.append("\n*edited*" + fileName);
         pw.close();
     }
 
