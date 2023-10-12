@@ -107,19 +107,25 @@ public class Tree {
         //empty folder
         if(content.equals(""))
         {
-            String emptyStringSHA = getSha1("");
-            File file = new File("objects/" + emptyStringSHA);
+            String emptyStringShaName = getSha1("");
+            File file = new File("objects/" + emptyStringShaName);
+            try (FileWriter fw = new FileWriter(file)) 
+            {
+                fw.write("");
+                fw.close();
+            }
             PrintWriter pw = new PrintWriter(new FileWriter("index", true));
             BufferedReader br = new BufferedReader(new FileReader("index")); 
             if (br.readLine() != null) 
             {
                 pw.append("\n");
             } 
-            String treeEntry = "tree : " + emptyStringSHA + " : " + directoryPath;
+            String treeEntry = "tree : " + emptyStringShaName + " : " + directoryPath;
             pw.append(treeEntry);
             pw.close();
             br.close();
             add(treeEntry);
+            content = treeEntry;
         }
         return getSha1(content);
     }
