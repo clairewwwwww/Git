@@ -102,7 +102,26 @@ public class Tree {
 
     public String addDirectory(String directoryPath) throws NoSuchAlgorithmException, Exception
     {
-        return getSha1(addDirectoryHelper(directoryPath));
+        String content = addDirectoryHelper(directoryPath);
+        
+        //empty folder
+        if(content.equals(""))
+        {
+            String emptyStringSHA = getSha1("");
+            File file = new File("objects/" + emptyStringSHA);
+            PrintWriter pw = new PrintWriter(new FileWriter("index", true));
+            BufferedReader br = new BufferedReader(new FileReader("index")); 
+            if (br.readLine() != null) 
+            {
+                pw.append("\n");
+            } 
+            String treeEntry = "tree : " + emptyStringSHA + " : " + directoryPath;
+            pw.append(treeEntry);
+            pw.close();
+            br.close();
+            add(treeEntry);
+        }
+        return getSha1(content);
     }
 
     public String addDirectoryHelper(String directoryPath) throws Exception
