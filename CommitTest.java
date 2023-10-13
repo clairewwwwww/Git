@@ -443,7 +443,40 @@ public class CommitTest
 
         String commit4SHA = fourthCommit.getCurrentSHA();
         Commit fifthCommit = new Commit(commit4SHA, "claire", "testing commit 5");
+        String commit5SHA = fifthCommit.getCurrentSHA();
+
+        String mostRecentSHA = fifthCommit.getCurrentSHA();
+        File commit5 = new File("objects/" + mostRecentSHA);
+        String actualCommit5Prev = getLine(commit5, 2);
+        String actualCommit5Next = getLine(commit5, 3);
+        assertEquals(commit4SHA, actualCommit5Prev);
+        assertEquals("", actualCommit5Next);
+
+        File commit4 = new File("objects/" + actualCommit5Prev);
+        String actualCommit4Prev = getLine(commit4, 2);
+        String actualCommit4Next = getLine(commit4, 3);
+        assertEquals(commit3SHA, actualCommit4Prev);
+        assertEquals(commit5SHA, actualCommit4Next);
+
+        File commit3 = new File("objects/" + actualCommit4Prev);
+        String actualCommit3Prev = getLine(commit3, 2);
+        String actualCommit3Next = getLine(commit3, 3);
+        assertEquals(commit2SHA, actualCommit3Prev);
+        assertEquals(commit4SHA, actualCommit3Next);
+
+        File commit2 = new File("objects/" + actualCommit3Prev);
+        String actualCommit2Prev = getLine(commit2, 2);
+        String actualCommit2Next = getLine(commit2, 3);
+        assertEquals(commit1SHA, actualCommit2Prev);
+        assertEquals(commit3SHA, actualCommit2Next);
+
+        File commit1 = new File("objects/" + actualCommit2Prev);
+        String actualCommit1Prev = getLine(commit1, 2);
+        String actualCommit1Next = getLine(commit1, 3);
+        assertEquals("", actualCommit1Prev);
+        assertEquals(commit2SHA, actualCommit1Next);
     }
+
     
 
     @Test

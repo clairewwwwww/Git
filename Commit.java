@@ -117,7 +117,7 @@ public class Commit {
             {
                 newTreeContent += "tree : " + getTreeFromSHA1(prevCommit);
             }
-        else
+            else
             {
                 newTreeContent = newTreeContent.substring(0, newTreeContent.length()-1);
             }
@@ -177,18 +177,6 @@ public class Commit {
                             target = true;
                         }
                     }
-                    // if(target == false)
-                    // {
-                    //     for(int k = 0; k < editFiles.size(); k++)
-                    //     {
-                    //         //if it's edited
-                    //         if(splits[2].equals(editFiles.get(k)))
-                    //         {
-                    //             needUpdateList.add(splits[1]);
-                    //             target = true;
-                    //         }
-                    //     }
-                    // }
                     if(target == false)
                     {
                         getContentExceptTargetFile(splits[1]);
