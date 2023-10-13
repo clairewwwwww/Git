@@ -20,12 +20,14 @@ public class Commit {
     private ArrayList<String> addFiles;
     private ArrayList<String> deleteFiles;
     private ArrayList<String> editFiles;
+    private ArrayList<String> needUpdateList;
 
     public Commit(String prevCommit, String author, String summary) throws Exception {
        this.prevCommit = prevCommit;
         addFiles = new ArrayList<String>();
         deleteFiles = new ArrayList<String>();
         editFiles = new ArrayList<String>();
+        needUpdateList = new ArrayList<String>();
         File commit = new File("Commit");
         PrintWriter commitWriter = new PrintWriter(new FileWriter(commit, false));
 
@@ -96,9 +98,15 @@ public class Commit {
             newTreeContent = newTreeContent.substring(0, newTreeContent.length()-1);
         }
 
-        /*PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
-        overwrite.write(newTreeContent);
-        overwrite.close(); */
+        for(int i = 0; i < needUpdateList.size(); i++)
+        {
+            String oldName = "objects/" + needUpdateList.get(i);
+            String newContent = Util.readFile(oldName);
+            File newFile = new File(Util.hashString(newContent));
+            PrintWriter pw = new PrintWriter(new FileWriter(newFile), false);
+            pw.print(newContent);
+            pw.close();
+        }
 
         return newTreeContent;
     }
@@ -132,6 +140,7 @@ public class Commit {
                             //if it's edited
                             if(splits[2].equals(editFiles.get(k)))
                             {
+                                needUpdateList.add(splits[1]);
                                 target = true;
                             }
                         }
@@ -154,17 +163,18 @@ public class Commit {
                             target = true;
                         }
                     }
-                    if(target == false)
-                    {
-                        for(int k = 0; k < editFiles.size(); k++)
-                        {
-                            //if it's edited
-                            if(splits[2].equals(editFiles.get(k)))
-                            {
-                                target = true;
-                            }
-                        }
-                    }
+                    // if(target == false)
+                    // {
+                    //     for(int k = 0; k < editFiles.size(); k++)
+                    //     {
+                    //         //if it's edited
+                    //         if(splits[2].equals(editFiles.get(k)))
+                    //         {
+                    //             needUpdateList.add(splits[1]);
+                    //             target = true;
+                    //         }
+                    //     }
+                    // }
                     if(target == false)
                     {
                         getContentExceptTargetFile(splits[1]);
