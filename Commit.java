@@ -28,14 +28,14 @@ public class Commit {
         editFiles = new ArrayList<String>();
         File commit = new File("Commit");
         PrintWriter commitWriter = new PrintWriter(new FileWriter(commit, false));
-        //Tree tree = new Tree();
-        String treeContent = getTreeContent();
-        //System.out.print(treeContent);
-        treeSha = Util.hashString(treeContent);
+
+        String newTreeContent = getNewTreeContent();
+        treeSha = Util.hashString(newTreeContent);
+
         String treeName = "objects/" + treeSha;
         File tree = new File(treeName);
         PrintWriter treeWriter = new PrintWriter(new FileWriter(tree), false);
-        treeWriter.write(treeContent);
+        treeWriter.write(newTreeContent);
         treeWriter.close();
         
         //Index index = new Index();
@@ -67,7 +67,6 @@ public class Commit {
         PrintWriter pw2 = new PrintWriter(new FileWriter(head, false));
         pw2.print(currentCommitSha);
         pw2.close();
-
     }
 
     public String getCurrentSHA() throws NoSuchAlgorithmException
@@ -75,68 +74,33 @@ public class Commit {
         return Util.hashString(currentContent);
     }
 
-    public String getTreeContent() throws IOException, Exception
+    public String getNewTreeContent() throws IOException, Exception
     {
-        String newIndexContent = getCurrentIndexContent();
-        //.out.print(newIndexContent);
-        treeSha = Util.hashString(newIndexContent);
-        if(deleteFile != "")
-        {
-            File prevCommitFile = new File("objects/" + prevCommit);
-            BufferedReader commitReader = new BufferedReader(new FileReader(prevCommitFile));
-            String prevTree = commitReader.readLine();
-            commitReader.close();
-            String newTreeContent = getContentExceptTargetFile(prevTree, deleteFile, "");
-            getContentExceptCommit(newTreeContent);
-            if((newTreeContent != null) && (newTreeContent != ""))
-            {
-                newTreeContent = newTreeContent.substring(0, newTreeContent.length() -1);
-            }
-            if((newIndexContent != "") && (newTreeContent != ""))
-            {
-                newIndexContent += "\n";
-            }
-            newIndexContent += newTreeContent;
-            treeSha = Util.hashString(newIndexContent);
-        }
-
+        String newTreeContent = "";
+        getCurrentIndexContent();
         if(prevCommit != null)
         {
-            if((newIndexContent != null) && (newIndexContent != ""))
-            {
-                newIndexContent += "\n";
-            }
-            newIndexContent += "tree : " + prevCommit;
+            getContentExceptTargetFile(getTreeFromSHA1(prevCommit));
         }
-
-        PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
-        overwrite.write(newIndexContent);
-        overwrite.close();
-        return newIndexContent;
-    }
-
-
-    private void getContentExceptCommit(String newTreeContent) throws IOException
-    {
-        File temp = new File("temp");
-        PrintWriter print = new PrintWriter(new FileWriter(temp), false);
-        print.print(newTreeContent);
-        print.close();
-        BufferedReader treeReader = new BufferedReader(new FileReader("temp"));
-        String tempContent = "";
-        while(treeReader.ready())
+        for(int i = 0; i < addFiles.size(); i++)
         {
-            String line = treeReader.readLine();
-            String[] splits = line.split(" : ");
-            if(splits.length == 3)
-            {
-                tempContent += line;
-                tempContent += "\n";
-            }
+            newTreeContent += addFiles.get(i);
+            newTreeContent += "\n";
         }
-        newTreeContent = tempContent;
-        temp.delete();
-        treeReader.close();
+        if(prevCommit != null)
+        {
+            newTreeContent += "tree : " + prevCommit;
+        }
+        else
+        {
+            newTreeContent = newTreeContent.substring(0, newTreeContent.length()-1);
+        }
+
+        /*PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
+        overwrite.write(newTreeContent);
+        overwrite.close(); */
+
+        return newTreeContent;
     }
 
     private void getContentExceptTargetFile(String tree) throws IOException
@@ -152,51 +116,65 @@ public class Commit {
                 if(splits[0].equals("blob"))
                 {
                     //find target
+                    boolean target = false;
                     for(int i = 0; i < deleteFiles.size(); i++)
                     {
-                        //if it's target
+                        //if it's delete
                         if(splits[2].equals(deleteFiles.get(i)))
                         {
-
+                            target = true;
                         }
-                        else if(splits[2].equals(editFiles.get(i)))
+                    }
+                    if(target == false)
+                    {
+                        for(int k = 0; k < editFiles.size(); k++)
                         {
-                            
+                            //if it's edited
+                            if(splits[2].equals(editFiles.get(k)))
+                            {
+                                target = true;
+                            }
                         }
-                        //if it's not
-                        else
-                        {
-                            addFiles.add(line);
-                        }
+                    }
+                    if(target == false)
+                    {
+                        addFiles.add(line);
                     }
                 }
                 //tree
                 else
                 {
                     //find target
+                    boolean target = false;
                     for(int i = 0; i < deleteFiles.size(); i++)
                     {
-                        //if it's target
+                        //if it's delete
                         if(splits[2].equals(deleteFiles.get(i)))
                         {
-
+                            target = true;
                         }
-                        else if(splits[2].equals(editFiles.get(i)))
+                    }
+                    if(target == false)
+                    {
+                        for(int k = 0; k < editFiles.size(); k++)
                         {
-
+                            //if it's edited
+                            if(splits[2].equals(editFiles.get(k)))
+                            {
+                                target = true;
+                            }
                         }
-                        //if it's not
-                        else
-                        {
-                            getContentExceptTargetFile(splits[1]);
-                        }
+                    }
+                    if(target == false)
+                    {
+                        getContentExceptTargetFile(splits[1]);
                     }
                 }
             }
             //commit
             else
             {
-                getContentExceptTargetFile(splits[1]);
+                //getContentExceptTargetFile(splits[1]);
             }
         }
         treeReader.close();
