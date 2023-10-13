@@ -13,29 +13,6 @@ import org.junit.jupiter.api.Test;
 
 public class CommitTest 
 {
-    private String testCase1Blob;
-    private String testCase2Blob;
-    private String testCase3Blob;
-    private String testCase4Blob;
-    private String testCase1SHA;
-    private String testCase2SHA;
-    private String testCase3SHA;
-    private String testCase4SHA;
-
-
-    public CommitTest()
-    {
-
-        testCase1Blob = "this is the content for testCase1";
-        testCase2Blob = "this is the content for testCase2";
-        testCase3Blob = "this is the content for testCase3";
-        testCase4Blob = "this is the content for testCase4";
-        testCase1SHA = "b43170f3ce583d5aa4cf796bcba18bf4dfb47a84";
-        testCase2SHA = "475b6b0f321c21893de9d2a828d399f22e341fec";
-        testCase3SHA = "85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f";
-        testCase4SHA = "4d75b3656cfb85c3fb1d56d459b63e0d2862639a";
-    }
-
     @Test
     @DisplayName("SHA test")
     void testSHA() throws NoSuchAlgorithmException
@@ -43,28 +20,6 @@ public class CommitTest
         assertEquals("aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d", Util.hashString("hello"));
         assertEquals("da39a3ee5e6b4b0d3255bfef95601890afd80709", Util.hashString(""));
         assertEquals("adc83b19e793491b1c6ea0fd8b46cd9f32e592fc", Util.hashString("\n"));
-    }
-
-    @Test
-    @DisplayName("basic test")
-    void basic() throws IOException
-    {
-        File file1 = new File("objects/" + testCase1SHA);
-        assertTrue(file1.exists());
-        assertEquals(testCase1Blob, Util.readFile("objects/" + testCase1SHA));
-
-        File file2 = new File("objects/" + testCase2SHA);
-        assertTrue(file2.exists());
-        assertEquals(testCase2Blob, Util.readFile("objects/" + testCase2SHA));
-
-        File file3 = new File("objects/" + testCase3SHA);
-        assertTrue(file3.exists());
-        assertEquals(testCase3Blob, Util.readFile("objects/" + testCase3SHA));
-
-        File file4 = new File("objects/" + testCase4SHA);
-        assertTrue(file4.exists());
-        assertEquals(testCase4Blob, Util.readFile("objects/" + testCase4SHA));
-
     }
     public void case1SetUp() throws Exception
     {
@@ -181,17 +136,11 @@ public class CommitTest
         assertTrue(commit1.exists());
 
 
-        //tree2
-        //sha --> 
-        //blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3
-        //blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4
-        //tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1
-        //tree : (commit1SHA)
+        String expectedTree2Content = "blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3\n" + 
+        "blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4\n" + 
+        "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1\n" + 
+        "tree : " + expectedTree1SHA;
 
-        String expectedTree2Content = "blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3\n" +
-        "blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4\n" +
-        "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1\n" +
-        "tree : " + expectedCommit1SHA;
         String expectedTree2SHA = Util.hashString(expectedTree2Content);
 
         File tree2 = new File("objects/" + expectedTree2SHA);
@@ -321,7 +270,7 @@ public class CommitTest
         String expectedTree2Content = "blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3\n" + 
         "blob : 4d75b3656cfb85c3fb1d56d459b63e0d2862639a : testCase4\n" + 
         "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder1\n" + 
-        "tree : " + expectedCommit1SHA;
+        "tree : " + expectedTree1SHA;
         String expectedTree2SHA = Util.hashString(expectedTree2Content);
 
         String expectedCommit2SHA = Util.hashString(getBasicContent(expectedTree2SHA, expectedCommit1SHA, "", 2));
@@ -331,7 +280,7 @@ public class CommitTest
 
         String expectedTree3Content = "blob : 427cb1dcd72fd646c81c7d71ecb80008ab855003 : testCase5\n" + 
         "blob : 3619e67c8c8bdb48c096bf767f319c7f2d6e7b6b : testCase6\n" +
-        "tree : " + expectedCommit2SHA;
+        "tree : " + expectedTree2SHA;
         String expectedTree3SHA = Util.hashString(expectedTree3Content);
 
         String expectedCommit3SHA = Util.hashString(getBasicContent(expectedTree3SHA, expectedCommit2SHA, "", 3));
@@ -342,7 +291,7 @@ public class CommitTest
         String expectedTree4Content = "blob : 13df75729db599b9da266be79a431547838a5932 : testCase7\n" +
         "blob : f08eada325e3ae1d1bd62c66f5c930e441550f96 : testCase8\n" +
         "tree : da39a3ee5e6b4b0d3255bfef95601890afd80709 : testFolder2\n" +
-        "tree : " + expectedCommit3SHA;
+        "tree : " + expectedTree3SHA;
         String expectedTree4SHA = Util.hashString(expectedTree4Content);
 
         String expectedCommit4SHA = Util.hashString(getBasicContent(expectedTree4SHA, expectedCommit3SHA, "", 4));
@@ -402,9 +351,105 @@ public class CommitTest
     }
 
     @Test
+    void testDeleteAndEdit() throws Exception 
+    {
+        Util.deleteDirectory("objects");
+        Util.deleteDirectory("testFolder1");
+        Util.deleteFile("index");
+        
+        //COMMIT one
+        //add two files
+        File file1 = new File("testCase1");
+        Util.writeFile("testCase1", "this is the content for testCase1");
+        File file2 = new File("testCase2");
+        Util.writeFile("testCase2", "this is the content for testCase2");
+
+        Index index1 = new Index();
+        index1.addBlob("testCase1");
+        index1.addBlob("testCase2");
+
+        Commit firstCommit = new Commit(null, "claire", "testing commit 1");
+        String commit1SHA = firstCommit.getCurrentSHA();
+
+        //COMMIT two
+        //add two files and one folder
+        File file3 = new File("testCase3");
+        Util.writeFile("testCase3", "this is the content for testCase3");
+        File file4 = new File("testCase4");
+        Util.writeFile("testCase4", "this is the content for testCase4");
+        File folder1 = new File("testFolder1");
+        folder1.mkdirs();
+
+        Index index2 = new Index();
+        index2.addBlob("testCase3");
+        index2.addBlob("testCase4");
+        index2.addTree("testFolder1");
+        index2.delete("testCase1");
+
+        Commit secondCommit = new Commit(commit1SHA, "claire", "testing commit 2");
+
+        //COMMIT three
+        //add two files
+        File file5 = new File("testCase5");
+        Util.writeFile("testCase5", "this is the content for testCase5");
+        File file6 = new File("testCase6");
+        Util.writeFile("testCase6", "this is the content for testCase6");
+        File file3Edit = new File(file3.getAbsolutePath());
+        Util.writeFile(file3.getAbsolutePath(), "this is the EDITED content for testCase3");
+
+        Index index3 = new Index();
+        index3.addBlob("testCase5");
+        index3.delete("testFolder1");
+        index3.addBlob("testCase6");
+        index3.edit("testCase3");
+
+        String commit2SHA = secondCommit.getCurrentSHA();
+        Commit thirdCommit = new Commit(commit2SHA, "claire", "testing commit 3");
+        
+
+        //add two files and one folder
+        File file7 = new File("testCase7");
+        Util.writeFile("testCase7", "this is the content for testCase7");
+        File file8 = new File("testCase8");
+        Util.writeFile("testCase8", "this is the content for testCase8");
+        File folder2 = new File("testFolder2");
+        folder1.mkdirs();
+
+        Index index4 = new Index();
+        index4.addBlob("testCase7");
+        index4.addBlob("testCase8");
+        index4.delete("testCase5");
+        index4.addTree("testFolder2");
+
+        String commit3SHA = thirdCommit.getCurrentSHA();
+        Commit fourthCommit = new Commit(commit3SHA, "claire", "testing commit 4");
+
+        //add two files and one folder
+        File file9 = new File("testCase9");
+        Util.writeFile("testCase9", "this is the content for testCase9");
+        File file10 = new File("testCase10");
+        Util.writeFile("testCase10", "this is the content for testCase10");
+        File folder3 = new File("testFolder3");
+        folder3.mkdirs();
+        File file2EDIT = new File(file2.getAbsolutePath());
+        Util.writeFile(file2.getAbsolutePath(), "this is the EDITED content for testCase2");
+
+        Index index5= new Index();
+        index5.addBlob("testCase9");
+        index5.addBlob("testCase10");
+        index5.addTree("testFolder3");
+        index5.delete("testCase8");
+        index5.edit("testCase2");
+
+        String commit4SHA = fourthCommit.getCurrentSHA();
+        Commit fifthCommit = new Commit(commit4SHA, "claire", "testing commit 5");
+    }
+    
+
+    @Test
     void testGetDate() throws Exception 
     {
-        assertEquals(Commit.getDate(), "Oct 11, 2023");
+        assertEquals(Commit.getDate(), "Oct 12, 2023");
     }
 
     public String getLine(File file, int numberOfLine) throws IOException

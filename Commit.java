@@ -15,16 +15,19 @@ public class Commit {
     //private File commit;
     private String prevCommit;
     private String currentContent;
+    private String currentCommitSha;
     private String treeSha;
     private String head;
-    private ArrayList<String> addFiles;
+    private ArrayList<String> addIndexFiles;
+    private ArrayList<String> addOldFiles;
     private ArrayList<String> deleteFiles;
     private ArrayList<String> editFiles;
     private ArrayList<String> needUpdateList;
 
     public Commit(String prevCommit, String author, String summary) throws Exception {
        this.prevCommit = prevCommit;
-        addFiles = new ArrayList<String>();
+        addIndexFiles = new ArrayList<String>();
+        addOldFiles = new ArrayList<String>();
         deleteFiles = new ArrayList<String>();
         editFiles = new ArrayList<String>();
         needUpdateList = new ArrayList<String>();
@@ -54,12 +57,8 @@ public class Commit {
         commitWriter.print(currentContent);
         commitWriter.close();
 
-        PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
-        overwrite.write("");
-        overwrite.close();
-
-        String currentCommitSha = "objects/" + Util.hashString(currentContent);
-        File newFile = new File(currentCommitSha);
+        currentCommitSha = Util.hashString(currentContent);
+        File newFile = new File("objects/" + currentCommitSha);
 
         commit.renameTo(newFile);
 
@@ -73,41 +72,56 @@ public class Commit {
 
     public String getCurrentSHA() throws NoSuchAlgorithmException
     {
-        return Util.hashString(currentContent);
+        return currentCommitSha;
     }
 
     public String getNewTreeContent() throws IOException, Exception
     {
+        
         String newTreeContent = "";
         getCurrentIndexContent();
+        
         if(prevCommit != null)
         {
             getContentExceptTargetFile(getTreeFromSHA1(prevCommit));
         }
-        for(int i = 0; i < addFiles.size(); i++)
-        {
-            newTreeContent += addFiles.get(i);
-            newTreeContent += "\n";
-        }
-        if(prevCommit != null)
-        {
-            newTreeContent += "tree : " + prevCommit;
-        }
-        else
-        {
-            newTreeContent = newTreeContent.substring(0, newTreeContent.length()-1);
-        }
-
         for(int i = 0; i < needUpdateList.size(); i++)
         {
-            String oldName = "objects/" + needUpdateList.get(i);
-            String newContent = Util.readFile(oldName);
-            File newFile = new File(Util.hashString(newContent));
+            String oldFileName = needUpdateList.get(i);
+            String newContent = Util.readFile(oldFileName);
+            String newSHA = Util.hashString(newContent);
+            File newFile = new File("objects/" + newSHA);
             PrintWriter pw = new PrintWriter(new FileWriter(newFile), false);
             pw.print(newContent);
             pw.close();
+            addIndexFiles.add("blob : " + newSHA + " : " + needUpdateList.get(i));
         }
-
+        for(int i = 0; i < addIndexFiles.size(); i++)
+        {
+            newTreeContent += addIndexFiles.get(i);
+            newTreeContent += "\n";
+        }
+        
+        if(deleteFiles.size() != 0 || editFiles.size() != 0)
+        {
+            for(int i = 0; i < addOldFiles.size(); i++)
+            {
+                newTreeContent += addOldFiles.get(i);
+                newTreeContent += "\n";
+            }
+            newTreeContent = newTreeContent.substring(0, newTreeContent.length()-1);
+        }
+        else
+        {
+            if(prevCommit != null)
+            {
+                newTreeContent += "tree : " + getTreeFromSHA1(prevCommit);
+            }
+        else
+            {
+                newTreeContent = newTreeContent.substring(0, newTreeContent.length()-1);
+            }
+        }
         return newTreeContent;
     }
 
@@ -140,14 +154,14 @@ public class Commit {
                             //if it's edited
                             if(splits[2].equals(editFiles.get(k)))
                             {
-                                needUpdateList.add(splits[1]);
+                                needUpdateList.add(splits[2]);
                                 target = true;
                             }
                         }
                     }
                     if(target == false)
                     {
-                        addFiles.add(line);
+                        addOldFiles.add(line);
                     }
                 }
                 //tree
@@ -181,10 +195,10 @@ public class Commit {
                     }
                 }
             }
-            //commit
+            //prevCommitTree
             else
             {
-                //getContentExceptTargetFile(splits[1]);
+                getContentExceptTargetFile(splits[1]);
             }
         }
         treeReader.close();
@@ -200,16 +214,19 @@ public class Commit {
             {
                 deleteFiles.add(line.substring(9));
             }
-            else if(line.substring(0, 9).equals("*edited*"))
+            else if(line.substring(0, 8).equals("*edited*"))
             {
-                editFiles.add(line.substring(9));
+                editFiles.add(line.substring(8));
             }
             else
             {
-                addFiles.add(line);
+                addIndexFiles.add(line);
             }
         }
         reader.close();
+        PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
+        overwrite.write("");
+        overwrite.close();
     }
 
     public void updatePreviousCommit() throws IOException, NoSuchAlgorithmException
