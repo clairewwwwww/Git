@@ -1,104 +1,227 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Commit {
     //private static final String Util = null;
     //private File commit;
     private String prevCommit;
-    private String current;
+    private String currentContent;
     private String treeSha;
     private String head;
+    private ArrayList<String> addFiles;
+    private ArrayList<String> deleteFiles;
+    private ArrayList<String> editFiles;
 
     public Commit(String prevCommit, String author, String summary) throws Exception {
        this.prevCommit = prevCommit;
+        addFiles = new ArrayList<String>();
+        deleteFiles = new ArrayList<String>();
+        editFiles = new ArrayList<String>();
         File commit = new File("Commit");
-        PrintWriter pw = new PrintWriter(new FileWriter(commit, false));
+        PrintWriter commitWriter = new PrintWriter(new FileWriter(commit, false));
         //Tree tree = new Tree();
-        treeSha = createTree();
+        String treeContent = getTreeContent();
+        //System.out.print(treeContent);
+        treeSha = Util.hashString(treeContent);
+        String treeName = "objects/" + treeSha;
+        File tree = new File(treeName);
+        PrintWriter treeWriter = new PrintWriter(new FileWriter(tree), false);
+        treeWriter.write(treeContent);
+        treeWriter.close();
+        
+        //Index index = new Index();
+        //index.addBlob(treeName);
+
         String date = getDate();
         String temp = prevCommit;
+
         if(prevCommit == null)
         {
             temp = "";
         }
-        current = treeSha + '\n' + temp + '\n' + '\n' + author + '\n' + date + '\n' + summary;
-        pw.print(current);
-        pw.close();
+        currentContent = treeSha + '\n' + temp + '\n' + '\n' + author + '\n' + date + '\n' + summary;
+        commitWriter.print(currentContent);
+        commitWriter.close();
 
-        String currentCommitSha = "objects/" + Util.hashString(current);
+        PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
+        overwrite.write("");
+        overwrite.close();
+
+        String currentCommitSha = "objects/" + Util.hashString(currentContent);
         File newFile = new File(currentCommitSha);
 
         commit.renameTo(newFile);
 
         updatePreviousCommit();
-
+        
         File head = new File("HEAD");
         PrintWriter pw2 = new PrintWriter(new FileWriter(head, false));
         pw2.print(currentCommitSha);
         pw2.close();
+
     }
 
     public String getCurrentSHA() throws NoSuchAlgorithmException
     {
-        return Util.hashString(current);
+        return Util.hashString(currentContent);
     }
 
-    public String createTree() throws IOException, Exception
+    public String getTreeContent() throws IOException, Exception
     {
-        Tree tree = new Tree();
-        String content = Util.readFile("index");
-        if(content != "")
+        String newIndexContent = getCurrentIndexContent();
+        //.out.print(newIndexContent);
+        treeSha = Util.hashString(newIndexContent);
+        if(deleteFile != "")
         {
-            content = content.substring(0, content.length() - 1);
+            File prevCommitFile = new File("objects/" + prevCommit);
+            BufferedReader commitReader = new BufferedReader(new FileReader(prevCommitFile));
+            String prevTree = commitReader.readLine();
+            commitReader.close();
+            String newTreeContent = getContentExceptTargetFile(prevTree, deleteFile, "");
+            getContentExceptCommit(newTreeContent);
+            if((newTreeContent != null) && (newTreeContent != ""))
+            {
+                newTreeContent = newTreeContent.substring(0, newTreeContent.length() -1);
+            }
+            if((newIndexContent != "") && (newTreeContent != ""))
+            {
+                newIndexContent += "\n";
+            }
+            newIndexContent += newTreeContent;
+            treeSha = Util.hashString(newIndexContent);
         }
+
         if(prevCommit != null)
         {
-            content += "\ntree : " + prevCommit;
+            if((newIndexContent != null) && (newIndexContent != ""))
+            {
+                newIndexContent += "\n";
+            }
+            newIndexContent += "tree : " + prevCommit;
         }
-        String fileName = "objects/" + Util.hashString(content);
-        File file = new File(fileName);
-        PrintWriter pw = new PrintWriter(new FileWriter(file), false);
-        pw.write(content);
-        pw.close();
-
-        String SHA = Util.hashString(content);
-
-        Index index = new Index();
-        index.addBlob(fileName);
 
         PrintWriter overwrite = new PrintWriter(new FileWriter("index"), false);
-        overwrite.write("");
+        overwrite.write(newIndexContent);
         overwrite.close();
-        return SHA;
+        return newIndexContent;
+    }
 
 
-        //other way
-        /* 
-        Tree tree = new Tree();
-        BufferedReader br = new BufferedReader(new FileReader("index"));
-        String content = "";
-        while(br.ready())
+    private void getContentExceptCommit(String newTreeContent) throws IOException
+    {
+        File temp = new File("temp");
+        PrintWriter print = new PrintWriter(new FileWriter(temp), false);
+        print.print(newTreeContent);
+        print.close();
+        BufferedReader treeReader = new BufferedReader(new FileReader("temp"));
+        String tempContent = "";
+        while(treeReader.ready())
         {
-            tree.add(br.readLine());
-            content += br.readLine();
+            String line = treeReader.readLine();
+            String[] splits = line.split(" : ");
+            if(splits.length == 3)
+            {
+                tempContent += line;
+                tempContent += "\n";
+            }
         }
-        br.close();
-        if(prevCommit != null)
-        {
-            tree.add("tree : " + prevCommit);
-            content += "\ntree : " + prevCommit;
-        }
-        tree.writeToFile();*/
+        newTreeContent = tempContent;
+        temp.delete();
+        treeReader.close();
+    }
 
-        //Util.writeFile(SHA, content);
-    
+    private void getContentExceptTargetFile(String tree) throws IOException
+    {
+        BufferedReader treeReader = new BufferedReader(new FileReader("objects/" + tree));
+        String line;
+        while(treeReader.ready() && (!((line = treeReader.readLine())).equals("")))
+        {  
+            String[] splits = line.split(" : ");
+            if(splits.length == 3)
+            {
+                //blob
+                if(splits[0].equals("blob"))
+                {
+                    //find target
+                    for(int i = 0; i < deleteFiles.size(); i++)
+                    {
+                        //if it's target
+                        if(splits[2].equals(deleteFiles.get(i)))
+                        {
+
+                        }
+                        else if(splits[2].equals(editFiles.get(i)))
+                        {
+                            
+                        }
+                        //if it's not
+                        else
+                        {
+                            addFiles.add(line);
+                        }
+                    }
+                }
+                //tree
+                else
+                {
+                    //find target
+                    for(int i = 0; i < deleteFiles.size(); i++)
+                    {
+                        //if it's target
+                        if(splits[2].equals(deleteFiles.get(i)))
+                        {
+
+                        }
+                        else if(splits[2].equals(editFiles.get(i)))
+                        {
+
+                        }
+                        //if it's not
+                        else
+                        {
+                            getContentExceptTargetFile(splits[1]);
+                        }
+                    }
+                }
+            }
+            //commit
+            else
+            {
+                getContentExceptTargetFile(splits[1]);
+            }
+        }
+        treeReader.close();
+    }
+
+    private void getCurrentIndexContent() throws IOException, Exception
+    {
+        BufferedReader reader = new BufferedReader(new FileReader("index"));
+        while(reader.ready())
+        {
+            String line = reader.readLine();
+            if(line.substring(0, 9).equals("*deleted*"))
+            {
+                deleteFiles.add(line.substring(9));
+            }
+            else if(line.substring(0, 9).equals("*edited*"))
+            {
+                editFiles.add(line.substring(9));
+            }
+            else
+            {
+                addFiles.add(line);
+            }
+        }
+        reader.close();
     }
 
     public void updatePreviousCommit() throws IOException, NoSuchAlgorithmException
@@ -117,7 +240,7 @@ public class Commit {
                 content += br.readLine();
                 content += "\n";
             }
-            content += Util.hashString(current);
+            content += getCurrentSHA();
             br.readLine();
             while(br.ready())
             {
@@ -154,7 +277,7 @@ public class Commit {
                 sb.append('\n' + br.readLine());
             line++;
         }
-
+        br.close();
         String str = sb.toString();
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         byte[] ret = (md.digest(str.getBytes()));
@@ -170,7 +293,7 @@ public class Commit {
         return result;
     }
 
-    public String getDate() {
+    public static String getDate() {
         java.util.Date date = new java.util.Date();
         String d = date.toString();
         String ret = d.substring(4, 10) + ", " + d.substring(24);
