@@ -73,9 +73,8 @@ public class Commit {
     public void checkout(String SHAOfACommit) throws IOException
     {
         String treeSha = getTreeFromSHA1(SHAOfACommit);
-        File newFile = new File("new");
-        BufferedReader reader = new BufferedReader(new FileReader(newFile));
-        PrintWriter printer = new PrintWriter(new FileWriter(newFile));
+        File current = new File("objects/" + currentCommitSha);
+        BufferedReader reader = new BufferedReader(new FileReader(current));
         String contentWithoutOldTree = "";
         reader.readLine();
         while(reader.ready())
@@ -85,6 +84,7 @@ public class Commit {
         }
         reader.close();
         String commitContent = treeSha + contentWithoutOldTree;
+        PrintWriter printer = new PrintWriter(new FileWriter(current));
         printer.print(commitContent);
         printer.close();
     }

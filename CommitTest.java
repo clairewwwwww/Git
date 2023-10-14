@@ -477,6 +477,43 @@ public class CommitTest
         assertEquals(commit2SHA, actualCommit1Next);
     }
 
+    @Test
+    void testCheckOut() throws Exception
+    {
+        File file1 = new File("testCase1");
+        Util.writeFile("testCase1", "this is the content for testCase1");
+
+        Index index1 = new Index();
+        index1.addBlob("testCase1");
+
+        Commit firstCommit = new Commit(null, "claire", "testing commit 1");
+        String commit1SHA = firstCommit.getCurrentSHA();
+
+        File file2 = new File("testCase2");
+        Util.writeFile("testCase2", "this is the content for testCase2");
+
+        Index index2 = new Index();
+        index2.addBlob("testCase2");
+
+        Commit secondCommit = new Commit(commit1SHA, "claire", "testing commit 2");
+        secondCommit.checkout(commit1SHA);
+
+        File file3 = new File("testCase3");
+        Util.writeFile("testCase3", "this is the content for testCase3");
+
+        Index index3 = new Index();
+        index3.addBlob("testCase3");
+
+        String commit2SHA = secondCommit.getCurrentSHA();
+        Commit thirdCommit = new Commit(commit2SHA, "claire", "testing commit 3");
+        
+        File file = new File("objects/" + thirdCommit.getCurrentSHA());
+        String tree = getLine(file, 1);
+        String expectedContent = "blob : 85d25f2ccd2fed2f8368498fd8f52ebefdeedb4f : testCase3\n" + 
+        "tree : 43ec163dbfe33d715e991e4a63965baa69560295";
+        String actualContent = Util.readFile("objects/" + tree);
+        assertEquals(expectedContent, actualContent);
+    }
     
 
     @Test
