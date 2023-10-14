@@ -70,6 +70,24 @@ public class Commit {
         pw2.close();
     }
 
+    public void checkout(String SHAOfACommit) throws IOException
+    {
+        String treeSha = getTreeFromSHA1(SHAOfACommit);
+        File newFile = new File("new");
+        BufferedReader reader = new BufferedReader(new FileReader(newFile));
+        PrintWriter printer = new PrintWriter(new FileWriter(newFile));
+        String contentWithoutOldTree = "";
+        reader.readLine();
+        while(reader.ready())
+        {
+            contentWithoutOldTree += "\n";
+            contentWithoutOldTree += reader.readLine();
+        }
+        reader.close();
+        String commitContent = treeSha + contentWithoutOldTree;
+        printer.print(commitContent);
+        printer.close();
+    }
     public String getCurrentSHA() throws NoSuchAlgorithmException
     {
         return currentCommitSha;
